@@ -1,8 +1,6 @@
 #![deny(missing_docs)]
 //! This crate exposes functionality for serialization and deserialization of types with a constant size, known at 
-//! compile time.
-//! 
-//! Any dynamically allocated types, such as, [`String`](std::string::String), [`Vec`](std::vec::Vec), 
+//! compile time. Any dynamically allocated types, such as, [`String`](std::string::String), [`Vec`](std::vec::Vec), 
 //! [`HashMap`](std::collections::HashMap), etc. cannot be serialized using this crate.
 //! 
 //! ## Future improvements
