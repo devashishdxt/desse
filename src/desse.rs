@@ -1,5 +1,3 @@
-use byteorder::{ByteOrder, LittleEndian};
-
 /// Any type must implement this trait for serialization and deserialization
 pub trait Desse<T>: Sized {
     /// Serializes current object
@@ -9,64 +7,28 @@ pub trait Desse<T>: Sized {
     fn deserialize_from(bytes: &T) -> Self;
 }
 
-impl Desse<[u8; 1]> for u8 {
-    fn serialize(&self) -> [u8; 1] {
-        [*self]
-    }
+macro_rules! impl_desse {
+    ($type: ty) => {
+        impl Desse<[u8; std::mem::size_of::<Self>()]> for $type {
+            fn serialize(&self) -> [u8; std::mem::size_of::<Self>()] {
+                self.to_le_bytes()
+            }
 
-    fn deserialize_from(bytes: &[u8; 1]) -> Self {
-        bytes[0]
-    }
+            fn deserialize_from(bytes: &[u8; std::mem::size_of::<Self>()]) -> Self {
+                Self::from_le_bytes(*bytes)
+            }
+        }
+    };
 }
 
-impl Desse<[u8; 2]> for u16 {
-    fn serialize(&self) -> [u8; 2] {
-        let mut bytes: [u8; 2] = Default::default();
-        LittleEndian::write_u16(&mut bytes, *self);
+impl_desse!(u8);
+impl_desse!(u16);
+impl_desse!(u32);
+impl_desse!(u64);
+impl_desse!(u128);
 
-        bytes
-    }
-
-    fn deserialize_from(bytes: &[u8; 2]) -> Self {
-        LittleEndian::read_u16(bytes)
-    }
-}
-
-impl Desse<[u8; 4]> for u32 {
-    fn serialize(&self) -> [u8; 4] {
-        let mut bytes: [u8; 4] = Default::default();
-        LittleEndian::write_u32(&mut bytes, *self);
-
-        bytes
-    }
-
-    fn deserialize_from(bytes: &[u8; 4]) -> Self {
-        LittleEndian::read_u32(bytes)
-    }
-}
-
-impl Desse<[u8; 8]> for u64 {
-    fn serialize(&self) -> [u8; 8] {
-        let mut bytes: [u8; 8] = Default::default();
-        LittleEndian::write_u64(&mut bytes, *self);
-
-        bytes
-    }
-
-    fn deserialize_from(bytes: &[u8; 8]) -> Self {
-        LittleEndian::read_u64(bytes)
-    }
-}
-
-impl Desse<[u8; 16]> for u128 {
-    fn serialize(&self) -> [u8; 16] {
-        let mut bytes: [u8; 16] = Default::default();
-        LittleEndian::write_u128(&mut bytes, *self);
-
-        bytes
-    }
-
-    fn deserialize_from(bytes: &[u8; 16]) -> Self {
-        LittleEndian::read_u128(bytes)
-    }
-}
+impl_desse!(i8);
+impl_desse!(i16);
+impl_desse!(i32);
+impl_desse!(i64);
+impl_desse!(i128);
