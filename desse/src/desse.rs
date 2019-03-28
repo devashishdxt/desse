@@ -38,7 +38,7 @@ macro_rules! impl_desse {
     };
 }
 
-macro_rules! impl_generic_desse_size_arr {
+macro_rules! impl_desse_size_generic_arr {
     ($num: expr) => {
         impl<T> DesseSized for [T; $num]
         where
@@ -51,10 +51,7 @@ macro_rules! impl_generic_desse_size_arr {
 
 macro_rules! impl_desse_arr {
     ([$type: ty; $num: expr]) => {
-        impl Desse for [$type; $num]
-        where
-            $type: Desse,
-        {
+        impl Desse for [$type; $num] {
             type Output = [u8; Self::SIZE];
 
             #[inline(always)]
@@ -107,16 +104,16 @@ impl_desse!(i32);
 impl_desse!(i64);
 impl_desse!(i128);
 
-impl_generic_desse_size_arr!(1);
-impl_generic_desse_size_arr!(2);
-impl_generic_desse_size_arr!(3);
-impl_generic_desse_size_arr!(4);
-impl_generic_desse_size_arr!(5);
-impl_generic_desse_size_arr!(6);
-impl_generic_desse_size_arr!(7);
-impl_generic_desse_size_arr!(8);
-impl_generic_desse_size_arr!(16);
-impl_generic_desse_size_arr!(32);
+impl_desse_size_generic_arr!(1);
+impl_desse_size_generic_arr!(2);
+impl_desse_size_generic_arr!(3);
+impl_desse_size_generic_arr!(4);
+impl_desse_size_generic_arr!(5);
+impl_desse_size_generic_arr!(6);
+impl_desse_size_generic_arr!(7);
+impl_desse_size_generic_arr!(8);
+impl_desse_size_generic_arr!(16);
+impl_desse_size_generic_arr!(32);
 
 impl_desse_arr!([u8; 1]);
 impl_desse_arr!([u8; 2]);
