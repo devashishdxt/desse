@@ -51,7 +51,10 @@ macro_rules! impl_generic_desse_size_arr {
 
 macro_rules! impl_desse_arr {
     ([$type: ty; $num: expr]) => {
-        impl Desse for [$type; $num] {
+        impl Desse for [$type; $num]
+        where
+            $type: Desse,
+        {
             type Output = [u8; Self::SIZE];
 
             #[inline(always)]
@@ -61,9 +64,9 @@ macro_rules! impl_desse_arr {
                 let mut counter = 0;
 
                 for element in self {
-                    (&mut bytes[counter..(counter + std::mem::size_of::<$type>())])
+                    (&mut bytes[counter..(counter + <$type>::SIZE)])
                         .copy_from_slice(&element.serialize());
-                    counter += std::mem::size_of::<$type>();
+                    counter += <$type>::SIZE;
                 }
 
                 bytes
@@ -78,12 +81,12 @@ macro_rules! impl_desse_arr {
                 for i in 0..$num {
                     unsafe {
                         arr[i] = <$type>::deserialize_from(
-                            &*(bytes[counter..(counter + std::mem::size_of::<$type>())].as_ptr()
-                                as *const [u8; std::mem::size_of::<$type>()]),
+                            &*(bytes[counter..(counter + <$type>::SIZE)].as_ptr()
+                                as *const [u8; <$type>::SIZE]),
                         );
                     }
 
-                    counter += std::mem::size_of::<$type>();
+                    counter += <$type>::SIZE;
                 }
 
                 arr
@@ -351,14 +354,14 @@ mod tests {
     impl_desse_test!([i64; 16], check_arr_i64_16);
     impl_desse_test!([i64; 32], check_arr_i64_32);
 
-    impl_desse_test!([i128; 1], check_arr_i128_1);
-    impl_desse_test!([i128; 2], check_arr_i128_2);
-    impl_desse_test!([i128; 3], check_arr_i128_3);
-    impl_desse_test!([i128; 4], check_arr_i128_4);
-    impl_desse_test!([i128; 5], check_arr_i128_5);
-    impl_desse_test!([i128; 6], check_arr_i128_6);
-    impl_desse_test!([i128; 7], check_arr_i128_7);
-    impl_desse_test!([i128; 8], check_arr_i128_8);
-    impl_desse_test!([i128; 16], check_arr_i128_16);
-    impl_desse_test!([i128; 32], check_arr_i128_32);
+    impl_desse_test!([i128; 1], check_arr_128_1);
+    impl_desse_test!([i128; 2], check_arr_128_2);
+    impl_desse_test!([i128; 3], check_arr_128_3);
+    impl_desse_test!([i128; 4], check_arr_128_4);
+    impl_desse_test!([i128; 5], check_arr_128_5);
+    impl_desse_test!([i128; 6], check_arr_128_6);
+    impl_desse_test!([i128; 7], check_arr_128_7);
+    impl_desse_test!([i128; 8], check_arr_128_8);
+    impl_desse_test!([i128; 16], check_arr_128_16);
+    impl_desse_test!([i128; 32], check_arr_128_32);
 }
