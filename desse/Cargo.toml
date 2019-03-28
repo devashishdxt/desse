@@ -1,0 +1,16 @@
+[package]
+name = "desse"
+version = "0.1.0"
+authors = ["Devashish Dixit <devashish@crypto.com>"]
+edition = "2018"
+
+[dependencies]
+
+[dev-dependencies]
+rand = "0.6"
+criterion = "0.2"
+byteorder = "1.3"
+
+[[bench]]
+name = "primitive_benchmark"
+harness = false
