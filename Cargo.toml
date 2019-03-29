@@ -1,2 +1,5 @@
 [workspace]
-members = [ "desse", "desse-codegen" ]
+members = [
+    "desse",
+    "desse-codegen"
+]
