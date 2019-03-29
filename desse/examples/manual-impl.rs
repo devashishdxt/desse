@@ -35,13 +35,20 @@ impl Desse for MyStruct {
 }
 
 fn main() {
-    let my_struct = MyStruct { a: rand::random(), b: rand::random() };
+    let my_struct = MyStruct {
+        a: rand::random(),
+        b: rand::random(),
+    };
 
     let serialized = my_struct.serialize();
 
     println!("Object    : {:?}", my_struct);
     println!("Serialized: {:?}", serialized);
 
-    assert_eq!(my_struct, MyStruct::deserialize_from(&serialized), "Wrong implementation");
+    assert_eq!(
+        my_struct,
+        MyStruct::deserialize_from(&serialized),
+        "Wrong implementation"
+    );
     println!("Done!");
 }
