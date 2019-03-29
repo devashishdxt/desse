@@ -15,3 +15,6 @@
 mod desse;
 
 pub use crate::desse::{Desse, DesseSized};
+
+#[cfg(feature = "derive")]
+pub use desse_derive::*;

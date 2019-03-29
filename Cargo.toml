@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "desse",
-    "desse-codegen"
+    "desse-codegen",
+    "desse-derive"
 ]
