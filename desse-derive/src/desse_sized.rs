@@ -37,8 +37,8 @@ fn get_struct_expr(struct_data: &DataStruct) -> TokenStream {
 
 fn get_struct_types(struct_data: &DataStruct) -> Vec<&Type> {
     match &struct_data.fields {
-        Named(named_fields) => named_fields.named.iter().map(|field| &field.ty).collect(),
-        Unnamed(unnamed_fields) => unnamed_fields
+        Named(ref named_fields) => named_fields.named.iter().map(|field| &field.ty).collect(),
+        Unnamed(ref unnamed_fields) => unnamed_fields
             .unnamed
             .iter()
             .map(|field| &field.ty)
