@@ -1,16 +1,23 @@
 use desse::{Desse, DesseSized};
 
-#[derive(Debug, Default, PartialEq, Desse, DesseSized)]
-struct MyStruct {
+#[derive(Debug, PartialEq, Desse, DesseSized)]
+struct Inner {
     a: u8,
     b: u16,
 }
 
+#[derive(Debug, PartialEq, Desse, DesseSized)]
+struct MyStruct {
+    inner: Inner,
+}
+
 fn main() {
-    let my_struct = MyStruct {
+    let inner = Inner {
         a: rand::random(),
         b: rand::random(),
     };
+
+    let my_struct = MyStruct { inner };
 
     let serialized = my_struct.serialize();
 

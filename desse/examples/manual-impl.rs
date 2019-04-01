@@ -49,10 +49,6 @@ fn main() {
 
     println!("De-serialized: {:?}", new_struct);
 
-    assert_eq!(
-        my_struct,
-        new_struct,
-        "Wrong implementation"
-    );
+    assert_eq!(my_struct, new_struct, "Wrong implementation");
     println!("Done!");
 }
