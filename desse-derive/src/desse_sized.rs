@@ -13,15 +13,13 @@ pub fn get_desse_sized_impl(input: DeriveInput) -> TokenStream {
         Union(ref union_data) => get_union_expr(union_data),
     };
 
-    let output = quote! {
+    quote! {
         #[automatically_derived]
         #[allow(unused_qualifications)]
         impl DesseSized for #name {
             const SIZE: usize = #expr;
         }
-    };
-
-    output
+    }
 }
 
 fn get_enum_expr(_enum_data: &DataEnum) -> TokenStream {
