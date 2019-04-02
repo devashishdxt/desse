@@ -62,7 +62,7 @@ macro_rules! impl_desse_arr {
 
                 for element in self {
                     (&mut bytes[counter..(counter + <$type>::SIZE)])
-                        .copy_from_slice(&element.serialize());
+                        .copy_from_slice(&Desse::serialize(element));
                     counter += <$type>::SIZE;
                 }
 
@@ -234,7 +234,7 @@ mod tests {
             #[test]
             fn $name() {
                 let num: $type = rand::random::<$type>();
-                let new_num = <$type>::deserialize_from(&num.serialize());
+                let new_num = <$type>::deserialize_from(&Desse::serialize(&num));
                 assert_eq!(num, new_num, "Invalid serialization / deserialization")
             }
         };

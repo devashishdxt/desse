@@ -80,7 +80,7 @@ fn get_serialize_expr_for_punctuated(punctuated: &Punctuated<Field, Comma>) -> T
         let ty = &field.ty;
 
         exprs.push(
-            quote! { (&mut bytes[ (#counter)..( #counter + <#ty>::SIZE ) ]).copy_from_slice(&self. #name .serialize()); },
+            quote! { (&mut bytes[ (#counter)..( #counter + <#ty>::SIZE ) ]).copy_from_slice(&Desse::serialize(&self. #name)); },
         );
 
         counter = quote! { #counter + <#ty>::SIZE };

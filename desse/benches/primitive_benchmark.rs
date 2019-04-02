@@ -5,7 +5,7 @@ use desse::Desse;
 
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench(
-        "serialize",
+        "primitive::serialize",
         Benchmark::new("desse::serialize", |b| {
             b.iter(|| {
                 let num: u128 = 3286752873;
@@ -21,7 +21,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
 
     c.bench(
-        "deserialize",
+        "primitive::deserialize",
         Benchmark::new("desse::deserialize", |b| {
             b.iter(|| {
                 let num: u128 = 3286752873;
