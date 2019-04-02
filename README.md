@@ -59,7 +59,7 @@ if it improves performance.
 ### Benchmarks
 Below are the benchmark results of comparison between `desse` and `bincode` serializing and deserializing same `struct`:
 ```
-struct::serialize/desse::serialize                                                                                     
+struct::serialize/desse::serialize
                         time:   [0.0000 ps 0.0000 ps 0.0000 ps]
                         change: [-62.670% -14.453% +94.233%] (p = 0.76 > 0.05)
                         No change in performance detected.
@@ -67,7 +67,7 @@ Found 12 outliers among 100 measurements (12.00%)
   4 (4.00%) high mild
   8 (8.00%) high severe
 
-struct::serialize/bincode::serialize                                                                            
+struct::serialize/bincode::serialize
                         time:   [81.037 ns 81.364 ns 81.720 ns]
                         change: [-1.2502% +0.3234% +1.8914%] (p = 0.69 > 0.05)
                         No change in performance detected.
@@ -75,7 +75,7 @@ Found 6 outliers among 100 measurements (6.00%)
   2 (2.00%) high mild
   4 (4.00%) high severe
 
-struct::deserialize/desse::deserialize                                                                                     
+struct::deserialize/desse::deserialize
                         time:   [0.0000 ps 0.0000 ps 0.0000 ps]
                         change: [-53.209% -3.5889% +94.796%] (p = 0.93 > 0.05)
                         No change in performance detected.
@@ -83,7 +83,7 @@ Found 12 outliers among 100 measurements (12.00%)
   4 (4.00%) high mild
   8 (8.00%) high severe
 
-struct::deserialize/bincode::deserialize                                                                            
+struct::deserialize/bincode::deserialize
                         time:   [86.441 ns 87.017 ns 87.708 ns]
                         change: [-1.6213% -0.0017% +1.7087%] (p = 1.00 > 0.05)
                         No change in performance detected.
