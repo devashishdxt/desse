@@ -10,6 +10,9 @@ categories = ["encoding"]
 keywords = ["serialization", "encoding", "binary", "macro"]
 edition = "2018"
 
+[badges]
+travis-ci = { repository = "devashishdxt/desse" }
+
 [dependencies]
 syn = "0.15"
 quote = "0.6"

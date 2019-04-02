@@ -10,6 +10,9 @@ categories = ["encoding"]
 keywords = ["serialization", "encoding", "binary"]
 edition = "2018"
 
+[badges]
+travis-ci = { repository = "devashishdxt/desse" }
+
 [lib]
 name = "desse"
 path = "src/lib.rs"
