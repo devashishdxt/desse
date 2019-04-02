@@ -1,4 +1,4 @@
-# Desse
+# Desse [![Build Status](https://travis-ci.org/devashishdxt/desse.svg?branch=master)](https://travis-ci.org/devashishdxt/desse)
 Ultra fast binary serialization and deserialization for types with a constant size (known at compile time). This
 crate cannot be used to serialize or deserialize dynamically allocated types, such as,
 [`String`](std::string::String), [`Vec`](std::vec::Vec), [`HashMap`](std::collections::HashMap), etc., and types 
