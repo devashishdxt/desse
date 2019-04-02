@@ -25,13 +25,13 @@ fn criterion_benchmark(c: &mut Criterion) {
         Benchmark::new("desse::serialize", |b| {
             b.iter(|| {
                 let my_struct: MyDesseStruct = MyDesseStruct { a: 253, b: 64016 };
-                black_box(Desse::serialize(&my_struct));
+                black_box(Desse::serialize(black_box(&my_struct)));
             })
         })
         .with_function("bincode::serialize", |b| {
             b.iter(|| {
                 let my_struct: MySerdeStruct = MySerdeStruct { a: 253, b: 64016 };
-                black_box(serialize(&my_struct));
+                black_box(serialize(black_box(&my_struct)));
             })
         }),
     );
@@ -40,14 +40,14 @@ fn criterion_benchmark(c: &mut Criterion) {
         "struct::deserialize",
         Benchmark::new("desse::deserialize", |b| {
             b.iter(|| {
-                let my_struct: MyDesseStruct = MyDesseStruct { a: 253, b: 64016 };
-                black_box(MyDesseStruct::deserialize_from(&Desse::serialize(&my_struct)));
+                let bytes: [u8; 3] = [253, 16, 250];
+                black_box(MyDesseStruct::deserialize_from(black_box(&bytes)));
             })
         })
         .with_function("bincode::deserialize", |b| {
             b.iter(|| {
-                let my_struct: MySerdeStruct = MySerdeStruct { a: 253, b: 64016 };
-                black_box(deserialize::<MySerdeStruct>(&serialize(&my_struct).unwrap()));
+                let bytes: [u8; 3] = [253, 16, 250];
+                black_box(deserialize::<MySerdeStruct>(black_box(&bytes)));
             })
         }),
     );
