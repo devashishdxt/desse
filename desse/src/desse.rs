@@ -25,12 +25,12 @@ macro_rules! impl_desse {
         impl Desse for $type {
             type Output = [u8; Self::SIZE];
 
-            #[inline(always)]
+            #[inline]
             fn serialize(&self) -> Self::Output {
                 self.to_le_bytes()
             }
 
-            #[inline(always)]
+            #[inline]
             fn deserialize_from(bytes: &Self::Output) -> Self {
                 Self::from_le_bytes(*bytes)
             }
@@ -54,7 +54,7 @@ macro_rules! impl_desse_arr {
         impl Desse for [$type; $num] {
             type Output = [u8; Self::SIZE];
 
-            #[inline(always)]
+            #[inline]
             fn serialize(&self) -> Self::Output {
                 let mut bytes: Self::Output = [0; Self::SIZE];
 
@@ -69,7 +69,7 @@ macro_rules! impl_desse_arr {
                 bytes
             }
 
-            #[inline(always)]
+            #[inline]
             fn deserialize_from(bytes: &Self::Output) -> Self {
                 let mut arr: Self = Default::default();
 

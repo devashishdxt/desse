@@ -21,7 +21,7 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
         impl Desse for #name {
             type Output = [u8; Self::SIZE];
 
-            #[inline(always)]
+            #[inline]
             fn serialize(&self) -> Self::Output {
                 let mut bytes: Self::Output = [0; Self::SIZE];
 
@@ -30,7 +30,7 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
                 bytes
             }
 
-            #[inline(always)]
+            #[inline]
             fn deserialize_from(bytes: &Self::Output) -> Self {
                 let mut object: Self = unsafe { std::mem::zeroed() };
 
