@@ -3,7 +3,7 @@ extern crate serde_derive;
 
 use criterion::{black_box, criterion_group, criterion_main, Benchmark, Criterion};
 
-use bincode::{deserialize, serialize};
+use bincode::{deserialize, serialize_into};
 use desse::{Desse, DesseSized};
 
 #[derive(Desse, DesseSized)]
@@ -29,9 +29,11 @@ fn criterion_benchmark(c: &mut Criterion) {
             })
         })
         .with_function("bincode::serialize", |b| {
+            let mut buffer = Vec::new();
             b.iter(|| {
+                buffer.clear();
                 let my_struct: MySerdeStruct = MySerdeStruct { a: 253, b: 64016 };
-                black_box(serialize(black_box(&my_struct)));
+                black_box(serialize_into(&mut buffer, black_box(&my_struct)));
             })
         }),
     );
