@@ -8,6 +8,7 @@ homepage = "https://github.com/devashishdxt/desse"
 repository = "https://github.com/devashishdxt/desse"
 categories = ["encoding"]
 keywords = ["serialization", "encoding", "binary", "macro"]
+readme = "README.md"
 edition = "2018"
 
 [badges]
