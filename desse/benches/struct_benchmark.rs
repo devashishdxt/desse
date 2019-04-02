@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate serde_derive;
 
-use criterion::{criterion_group, criterion_main, Benchmark, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, Benchmark, Criterion};
 
 use bincode::{deserialize, serialize};
 use desse::{Desse, DesseSized};
@@ -25,13 +25,13 @@ fn criterion_benchmark(c: &mut Criterion) {
         Benchmark::new("desse::serialize", |b| {
             b.iter(|| {
                 let my_struct: MyDesseStruct = MyDesseStruct { a: 253, b: 64016 };
-                Desse::serialize(&my_struct);
+                black_box(Desse::serialize(&my_struct));
             })
         })
         .with_function("bincode::serialize", |b| {
             b.iter(|| {
                 let my_struct: MySerdeStruct = MySerdeStruct { a: 253, b: 64016 };
-                serialize(&my_struct);
+                black_box(serialize(&my_struct));
             })
         }),
     );
@@ -41,13 +41,13 @@ fn criterion_benchmark(c: &mut Criterion) {
         Benchmark::new("desse::deserialize", |b| {
             b.iter(|| {
                 let my_struct: MyDesseStruct = MyDesseStruct { a: 253, b: 64016 };
-                MyDesseStruct::deserialize_from(&Desse::serialize(&my_struct));
+                black_box(MyDesseStruct::deserialize_from(&Desse::serialize(&my_struct)));
             })
         })
         .with_function("bincode::deserialize", |b| {
             b.iter(|| {
                 let my_struct: MySerdeStruct = MySerdeStruct { a: 253, b: 64016 };
-                deserialize::<MySerdeStruct>(&serialize(&my_struct).unwrap());
+                black_box(deserialize::<MySerdeStruct>(&serialize(&my_struct).unwrap()));
             })
         }),
     );
