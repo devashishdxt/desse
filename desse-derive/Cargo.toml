@@ -18,4 +18,5 @@ proc-macro2 = "0.4"
 [lib]
 name = "desse_derive"
 path = "src/lib.rs"
+doctest = false
 proc-macro = true

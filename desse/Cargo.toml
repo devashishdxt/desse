@@ -13,6 +13,7 @@ edition = "2018"
 [lib]
 name = "desse"
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 desse-derive = { path = "../desse-derive", optional = true }
