@@ -52,17 +52,6 @@
 //!
 //! Note that `Desse::serialize` returns an array of fixed length (`3` in above case) and `Desse::deserialize` takes
 //! reference to an array of fixed length as argument.
-//!
-//! ## Performance
-//!
-//! This crate values performance more than anything. We don't shy away from using tested and verified **unsafe** code
-//! if it improves performance.
-//!
-//! ## Future Improvements
-//!
-//! Once [`const_generics`](https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md) is implemented
-//! in Rust, we can provide default implementations for many types such as, `impl Desse for [T; n] where T: Desse`, and
-//! other variable size statically allocated types in Rust.
 mod desse;
 
 pub use crate::desse::{Desse, DesseSized};

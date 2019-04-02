@@ -56,6 +56,51 @@ reference to an array of fixed length as argument.
 This crate values performance more than anything. We don't shy away from using tested and verified **unsafe** code
 if it improves performance.
 
+### Benchmarks
+Below are the benchmark results of comparison between `desse` and `bincode` serializing and deserializing same `struct`:
+```
+struct::serialize/desse::serialize                                                                                     
+                        time:   [0.0000 ps 0.0000 ps 0.0000 ps]
+                        change: [-62.670% -14.453% +94.233%] (p = 0.76 > 0.05)
+                        No change in performance detected.
+Found 12 outliers among 100 measurements (12.00%)
+  4 (4.00%) high mild
+  8 (8.00%) high severe
+
+struct::serialize/bincode::serialize                                                                            
+                        time:   [81.037 ns 81.364 ns 81.720 ns]
+                        change: [-1.2502% +0.3234% +1.8914%] (p = 0.69 > 0.05)
+                        No change in performance detected.
+Found 6 outliers among 100 measurements (6.00%)
+  2 (2.00%) high mild
+  4 (4.00%) high severe
+
+struct::deserialize/desse::deserialize                                                                                     
+                        time:   [0.0000 ps 0.0000 ps 0.0000 ps]
+                        change: [-53.209% -3.5889% +94.796%] (p = 0.93 > 0.05)
+                        No change in performance detected.
+Found 12 outliers among 100 measurements (12.00%)
+  4 (4.00%) high mild
+  8 (8.00%) high severe
+
+struct::deserialize/bincode::deserialize                                                                            
+                        time:   [86.441 ns 87.017 ns 87.708 ns]
+                        change: [-1.6213% -0.0017% +1.7087%] (p = 1.00 > 0.05)
+                        No change in performance detected.
+Found 9 outliers among 100 measurements (9.00%)
+  3 (3.00%) high mild
+  6 (6.00%) high severe
+```
+
+It is clear from above benchmarks that `bincode` takes `81.364 ns` on an average for serialization whereas `desse` takes
+`0.0000 ps`. The results are also similar for deserialization where `bincode` takes `87.017 ns` and `desse` takes
+`0.0000 ps`.
+
+You can run benchmarks by running following command:
+```
+cargo bench
+```
+
 ## Future Improvements
 Once [`const_generics`](https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md) is implemented
 in Rust, we can provide default implementations for many types such as, `impl Desse for [T; n] where T: Desse`, and
