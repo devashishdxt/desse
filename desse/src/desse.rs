@@ -19,7 +19,7 @@ pub trait DesseSized: Sized {
 macro_rules! impl_desse {
     ($type: ty) => {
         impl DesseSized for $type {
-            const SIZE: usize = std::mem::size_of::<Self>();
+            const SIZE: usize = core::mem::size_of::<Self>();
         }
 
         impl Desse for $type {
