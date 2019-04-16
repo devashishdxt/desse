@@ -7,7 +7,7 @@ description = "Ultra fast binary serialization and deserialization for types wit
 homepage = "https://github.com/devashishdxt/desse"
 repository = "https://github.com/devashishdxt/desse"
 categories = ["encoding"]
-keywords = ["serialization", "encoding", "binary"]
+keywords = ["serialization", "encoding", "binary", "no_std"]
 readme = "README.md"
 edition = "2018"
 

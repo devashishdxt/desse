@@ -52,6 +52,9 @@
 //!
 //! Note that `Desse::serialize` returns an array of fixed length (`3` in above case) and `Desse::deserialize` takes
 //! reference to an array of fixed length as argument.
+
+#![no_std]
+
 mod desse;
 
 pub use crate::desse::{Desse, DesseSized};
