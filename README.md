@@ -60,41 +60,41 @@ if it improves performance.
 Below are the benchmark results of comparison between `desse` and `bincode` serializing and deserializing same `struct`:
 ```
 struct::serialize/desse::serialize
-                        time:   [1.4489 ns 1.4530 ns 1.4579 ns]
-                        change: [-0.7337% +0.2382% +1.4333%] (p = 0.69 > 0.05)
+                        time:   [1.0707 ns 1.0733 ns 1.0765 ns]
+                        change: [-0.4340% +1.0979% +2.8290%] (p = 0.18 > 0.05)
                         No change in performance detected.
-Found 7 outliers among 100 measurements (7.00%)
+Found 13 outliers among 100 measurements (13.00%)
   3 (3.00%) high mild
-  4 (4.00%) high severe
+  10 (10.00%) high severe
 
 struct::serialize/bincode::serialize
-                        time:   [11.159 ns 11.199 ns 11.243 ns]
-                        change: [-0.3531% +0.4925% +1.4845%] (p = 0.28 > 0.05)
+                        time:   [16.005 ns 16.042 ns 16.081 ns]
+                        change: [-1.7999% -0.5179% +0.8202%] (p = 0.45 > 0.05)
                         No change in performance detected.
-Found 8 outliers among 100 measurements (8.00%)
-  3 (3.00%) high mild
+Found 9 outliers among 100 measurements (9.00%)
+  4 (4.00%) high mild
   5 (5.00%) high severe
 
 struct::deserialize/desse::deserialize
-                        time:   [5.2186 ns 5.2420 ns 5.2696 ns]
-                        change: [-0.7439% +0.1907% +1.1152%] (p = 0.70 > 0.05)
+                        time:   [1.3383 ns 1.3433 ns 1.3503 ns]
+                        change: [-1.4627% -0.0804% +1.4476%] (p = 0.92 > 0.05)
                         No change in performance detected.
-Found 12 outliers among 100 measurements (12.00%)
-  6 (6.00%) high mild
+Found 7 outliers among 100 measurements (7.00%)
+  1 (1.00%) high mild
   6 (6.00%) high severe
 
 struct::deserialize/bincode::deserialize
-                        time:   [12.748 ns 12.809 ns 12.877 ns]
-                        change: [-0.8527% -0.1328% +0.5373%] (p = 0.72 > 0.05)
+                        time:   [15.020 ns 15.069 ns 15.133 ns]
+                        change: [-1.0730% +0.2426% +1.5766%] (p = 0.74 > 0.05)
                         No change in performance detected.
-Found 10 outliers among 100 measurements (10.00%)
-  4 (4.00%) high mild
-  6 (6.00%) high severe
+Found 9 outliers among 100 measurements (9.00%)
+  1 (1.00%) high mild
+  8 (8.00%) high severe
 ```
 
-It is clear from above benchmarks that `bincode` takes `11.199 ns` on an average for serialization whereas `desse` takes
-`1.4530 ns`. The results are also similar for deserialization where `bincode` takes `12.809 ns` and `desse` takes
-`5.2420 ns`.
+It is clear from above benchmarks that `bincode` takes `16.042 ns` on an average for serialization whereas `desse` takes
+`1.0733 ns`. The results are also similar for deserialization where `bincode` takes `15.069 ns` and `desse` takes
+`1.3433 ns`.
 
 You can run benchmarks by running following command:
 ```

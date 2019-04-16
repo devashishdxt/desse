@@ -62,7 +62,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         })
         .with_function("bincode::deserialize", |b| {
             b.iter(|| {
-                let bytes: [u8; 4] = [253, 16, 250, 0];
+                let bytes: [u8; 7] = [253, 16, 250, 0, 0, 0, 0];
                 black_box(deserialize::<MySerdeStruct>(black_box(&bytes)));
             })
         }),
