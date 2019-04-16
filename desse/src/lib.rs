@@ -61,3 +61,20 @@ pub use crate::desse::{Desse, DesseSized};
 
 #[cfg(feature = "derive")]
 pub use desse_derive::*;
+
+/// Compares and returns maximum of two values.
+///
+/// # Warning
+///
+/// This function internally uses bitwise operations to find maximum value, which, in some cases, may not be best
+/// approach. But, Rust's [`max()`](https://doc.rust-lang.org/nightly/std/cmp/fn.max.html) is not a `const fn` which is
+/// needed for compile time evaluation of `max` value.
+///
+/// The need for this function will go away once [`const fn`](https://github.com/rust-lang/rust/issues/57563) fully
+/// lands in stable and `max()` becomes a `const fn`.
+pub const fn max(x: usize, y: usize) -> usize {
+    let x = x as i128;
+    let y = y as i128;
+
+    (x ^ ((x ^ y) & -((x < y) as i128))) as usize
+}
