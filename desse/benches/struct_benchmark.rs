@@ -38,7 +38,11 @@ fn criterion_benchmark(c: &mut Criterion) {
         "struct::serialize",
         Benchmark::new("desse::serialize", |b| {
             b.iter(|| {
-                let my_struct: MyDesseStruct = MyDesseStruct { a: 253, b: 64016, c: MyDesseEnum::Variant1 };
+                let my_struct: MyDesseStruct = MyDesseStruct {
+                    a: 253,
+                    b: 64016,
+                    c: MyDesseEnum::Variant1,
+                };
                 black_box(Desse::serialize(black_box(&my_struct)));
             })
         })
@@ -46,7 +50,11 @@ fn criterion_benchmark(c: &mut Criterion) {
             let mut buffer = Vec::new();
             b.iter(|| {
                 buffer.clear();
-                let my_struct: MySerdeStruct = MySerdeStruct { a: 253, b: 64016, c: MySerdeEnum::Variant1 };
+                let my_struct: MySerdeStruct = MySerdeStruct {
+                    a: 253,
+                    b: 64016,
+                    c: MySerdeEnum::Variant1,
+                };
                 black_box(serialize_into(&mut buffer, black_box(&my_struct)));
             })
         }),
