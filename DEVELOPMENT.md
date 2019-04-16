@@ -32,4 +32,3 @@ Below is a high level development plan for `desse` crate:
 
 - Bug fixes and stabilization of APIs.
 - Release as **LTS**.
-

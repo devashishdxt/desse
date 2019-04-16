@@ -4,6 +4,7 @@ use desse::{Desse, DesseSized};
 struct Inner {
     a: u8,
     b: u16,
+    c: MyEnum,
 }
 
 #[derive(Debug, PartialEq, Desse, DesseSized)]
@@ -11,10 +12,18 @@ struct MyStruct {
     inner: Inner,
 }
 
+#[derive(Debug, PartialEq, Desse, DesseSized)]
+enum MyEnum {
+    Variant1,
+    Variant2,
+    Variant3,
+}
+
 fn main() {
     let inner = Inner {
         a: rand::random(),
         b: rand::random(),
+        c: MyEnum::Variant1,
     };
 
     let my_struct = MyStruct { inner };
