@@ -83,39 +83,3 @@ fn get_enum_desse_deserialize_expr(name: &Ident, enum_data: &DataEnum) -> TokenS
         #match_expr
     }
 }
-
-// fn get_variant_expr(enum_data: &DataEnum) -> TokenStream {
-//     let len = enum_data.variants.len();
-
-//     if len <= <u8>::max_value() as usize {
-//         quote! {
-//             let variant = unsafe {
-//                 <u8>::deserialize_from(&*(bytes[0..Self::SIZE].as_ptr() as *const [u8; Self::SIZE]))
-//             } as usize;
-//         }
-//     } else if len <= <u16>::max_value() as usize {
-//         quote! {
-//             let variant = unsafe {
-//                 <u16>::deserialize_from(&*(bytes[0..Self::SIZE].as_ptr() as *const [u8; Self::SIZE]))
-//             } as usize;
-//         }
-//     } else if len <= <u32>::max_value() as usize {
-//         quote! {
-//             let variant = unsafe {
-//                 <u32>::deserialize_from(&*(bytes[0..Self::SIZE].as_ptr() as *const [u8; Self::SIZE]))
-//             } as usize;
-//         }
-//     } else if len <= <u64>::max_value() as usize {
-//         quote! {
-//             let variant = unsafe {
-//                 <u64>::deserialize_from(&*(bytes[0..Self::SIZE].as_ptr() as *const [u8; Self::SIZE]))
-//             } as usize;
-//         }
-//     } else {
-//         quote! {
-//             let variant = unsafe {
-//                 <u128>::deserialize_from(&*(bytes[0..Self::SIZE].as_ptr() as *const [u8; Self::SIZE]))
-//             } as usize;
-//         }
-//     }
-// }
