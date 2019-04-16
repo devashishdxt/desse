@@ -4,6 +4,9 @@ rust:
   - stable
   - beta
   - nightly
+branches:
+  only:
+    - master
 matrix:
   allow_failures:
     - rust: nightly
