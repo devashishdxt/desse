@@ -77,7 +77,7 @@ impl SerializeExpr {
         for (i, field) in enum_data.variants.iter().enumerate() {
             let variant_name = &field.ident;
             match_exprs.push(quote! {
-                #name:: #variant_name  => (#i as #size_type).serialize()
+                #name:: #variant_name  => Desse::serialize(&(#i as #size_type))
             });
         }
 

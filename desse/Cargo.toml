@@ -35,9 +35,5 @@ default = ["derive"]
 derive = ["desse-derive"]
 
 [[bench]]
-name = "primitive_benchmark"
-harness = false
-
-[[bench]]
 name = "struct_benchmark"
 harness = false
