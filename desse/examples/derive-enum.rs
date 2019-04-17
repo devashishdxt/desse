@@ -7,6 +7,7 @@ enum MyEnum {
     Variant3,
 }
 
+#[allow(unused)]
 #[derive(Debug, PartialEq, DesseSized)]
 enum NonUnitEnum {
     Variant1,
