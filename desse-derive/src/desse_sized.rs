@@ -3,15 +3,15 @@ use quote::quote;
 use syn::Data::*;
 use syn::DeriveInput;
 
-use crate::impls::enum_impl::*;
-use crate::impls::struct_impl::*;
+use crate::expr::SizeExpr;
 
+/// Returns `DesseSized` trait implementation
 pub fn get_desse_sized_impl(input: DeriveInput) -> TokenStream {
     let name = input.ident;
 
     let expr = match &input.data {
-        Struct(ref struct_data) => get_struct_desse_sized_expr(struct_data),
-        Enum(ref enum_data) => get_enum_desse_sized_expr(enum_data),
+        Struct(ref struct_data) => SizeExpr::for_struct(struct_data),
+        Enum(ref enum_data) => SizeExpr::for_enum(enum_data),
         Union(_) => panic!("This macro cannot be used on unions!"),
     };
 

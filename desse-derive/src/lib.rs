@@ -5,8 +5,7 @@ use syn::{parse_macro_input, DeriveInput};
 
 mod desse;
 mod desse_sized;
-
-mod impls;
+mod expr;
 
 #[proc_macro_derive(DesseSized)]
 pub fn desse_sized_macro_derive(input: TokenStream) -> TokenStream {
