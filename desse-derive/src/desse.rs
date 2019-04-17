@@ -3,15 +3,21 @@ use quote::quote;
 use syn::Data::*;
 use syn::DeriveInput;
 
-use crate::impls::enum_impl::*;
-use crate::impls::struct_impl::*;
+use crate::expr::{DeserializeExpr, SerializeExpr};
 
+/// Returns `Desse` trait implementation
 pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
     let name = input.ident;
 
     let (serialize, deserialize) = match &input.data {
-        Struct(ref struct_data) => get_struct_desse_expr(&struct_data),
-        Enum(ref enum_data) => get_enum_desse_expr(&name, enum_data),
+        Struct(ref struct_data) => (
+            SerializeExpr::for_struct(&struct_data),
+            DeserializeExpr::for_struct(&struct_data),
+        ),
+        Enum(ref enum_data) => (
+            SerializeExpr::for_enum(&name, &enum_data),
+            DeserializeExpr::for_enum(&name, &enum_data),
+        ),
         Union(_) => panic!("This macro cannot be used on unions!"),
     };
 
