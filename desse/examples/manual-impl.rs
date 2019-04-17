@@ -16,21 +16,19 @@ impl Desse for MyStruct {
     fn serialize(&self) -> Self::Output {
         let mut bytes: Self::Output = Default::default();
 
-        (&mut bytes[0..1]).copy_from_slice(&self.a.serialize());
-        (&mut bytes[1..3]).copy_from_slice(&self.b.serialize());
+        (&mut bytes[0..1]).copy_from_slice(&Desse::serialize(&self.a));
+        (&mut bytes[1..3]).copy_from_slice(&Desse::serialize(&self.b));
 
         bytes
     }
 
     fn deserialize_from(bytes: &Self::Output) -> Self {
-        let mut object: Self = Default::default();
-
         unsafe {
-            object.a = <u8>::deserialize_from(&*(bytes[0..1].as_ptr() as *const [u8; 1]));
-            object.b = <u16>::deserialize_from(&*(bytes[1..3].as_ptr() as *const [u8; 2]));
+            MyStruct {
+                a: <u8>::deserialize_from(&*(bytes[0..1].as_ptr() as *const [u8; 1])),
+                b: <u16>::deserialize_from(&*(bytes[1..3].as_ptr() as *const [u8; 2])),
+            }
         }
-
-        object
     }
 }
 

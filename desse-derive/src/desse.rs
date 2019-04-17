@@ -11,8 +11,8 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
 
     let (serialize, deserialize) = match &input.data {
         Struct(ref struct_data) => (
-            SerializeExpr::for_struct(&struct_data),
-            DeserializeExpr::for_struct(&struct_data),
+            SerializeExpr::for_struct(&name, &struct_data),
+            DeserializeExpr::for_struct(&name, &struct_data),
         ),
         Enum(ref enum_data) => (
             SerializeExpr::for_enum(&name, &enum_data),
@@ -29,7 +29,9 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
 
             #[inline]
             fn serialize(&self) -> Self::Output {
+                let mut bytes: Self::Output = [0; Self::SIZE];
                 #serialize
+                bytes
             }
 
             #[inline]
