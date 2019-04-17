@@ -55,8 +55,15 @@ impl SizeExpr {
     }
 
     /// Calculates size expression for maximum sized variant
-    fn get_variant_max_size_expr<T>(_variants: &Punctuated<Variant, T>) -> TokenStream {
-        quote! { 0 }
+    fn get_variant_max_size_expr<T>(variants: &Punctuated<Variant, T>) -> TokenStream {
+        let mut max_size_expr = quote! { 0 };
+
+        for variant in variants {
+            let variant_size_expr = Self::get_size_expr_for_variant(variant);
+            max_size_expr = quote! { desse::max(#max_size_expr, #variant_size_expr) };
+        }
+
+        max_size_expr
     }
 
     /// Calculates size type for number of variants (used for enums)

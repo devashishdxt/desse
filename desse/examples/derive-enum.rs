@@ -7,6 +7,13 @@ enum MyEnum {
     Variant3,
 }
 
+#[derive(Debug, PartialEq, DesseSized)]
+enum NonUnitEnum {
+    Variant1,
+    Variant2(u8, u16),
+    Variant3 { a: u64 },
+}
+
 fn main() {
     let my_enum = MyEnum::Variant1;
 
@@ -20,5 +27,6 @@ fn main() {
     println!("De-serialized: {:?}", new_enum);
 
     assert_eq!(my_enum, new_enum, "Wrong implementation");
+    assert_eq!(9, NonUnitEnum::SIZE);
     println!("Done!");
 }
