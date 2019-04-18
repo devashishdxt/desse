@@ -126,7 +126,9 @@ impl SerializeExpr {
 
             let variant_name = &variant.ident;
             let variant_init_expr = quote! {
-                Desse::serialize_into(&(#index as #size_type), &mut *(bytes[0..<#size_type>::SIZE].as_mut_ptr() as *mut [u8; <#size_type>::SIZE]));
+                unsafe {
+                    Desse::serialize_into(&(#index as #size_type), &mut *(bytes[0..<#size_type>::SIZE].as_mut_ptr() as *mut [u8; <#size_type>::SIZE]));
+                }
             };
             let variant_impl_expr = Self::get_serialize_expr_for_fields(
                 field_prefix,
@@ -135,10 +137,8 @@ impl SerializeExpr {
             );
 
             let variant_expr = quote! {
-                unsafe {
-                    #variant_init_expr
-                    #variant_impl_expr
-                }
+                #variant_init_expr
+                #variant_impl_expr
             };
 
             match_exprs.push(quote! {
