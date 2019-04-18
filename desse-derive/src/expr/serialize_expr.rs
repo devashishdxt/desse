@@ -71,13 +71,6 @@ impl SerializeExpr {
     }
 
     /// Calculates serialize expression for [`DataEnum`](syn::DataEnum)
-    ///
-    /// # Todo
-    ///
-    /// Currently, this function takes `name` as input for referencing different variants of enum, for example,
-    /// `MyEnum::Variant1`. The need for this will go away in future once
-    /// [`type_alias_enum_variants`](https://github.com/rust-lang/rust/issues/49683) lands in stable which will enable
-    /// us to write `Self::Variant1` instead.
     pub fn for_enum(name: &Ident, enum_data: &DataEnum) -> TokenStream {
         let variant_count = enum_data.variants.len();
 

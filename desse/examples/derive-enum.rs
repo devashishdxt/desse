@@ -5,8 +5,8 @@ use desse::{Desse, DesseSized};
 #[derive(Debug, PartialEq, DesseSized, Desse)]
 enum MyEnum {
     Variant1,
-    Variant2,
-    Variant3,
+    Variant2(u16),
+    Variant3(u8),
 }
 
 #[allow(unused)]
@@ -20,11 +20,12 @@ enum NonUnitEnum {
 fn main() {
     let my_enum = NonUnitEnum::Variant3 {
         a: random(),
-        b: MyEnum::Variant3,
+        b: MyEnum::Variant3(random()),
     };
 
     let serialized = my_enum.serialize();
 
+    println!("Size         : {}", NonUnitEnum::SIZE);
     println!("Object       : {:?}", my_enum);
     println!("Serialized   : {:?}", serialized);
 
