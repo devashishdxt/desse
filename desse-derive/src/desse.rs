@@ -30,8 +30,13 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
             #[inline]
             fn serialize(&self) -> Self::Output {
                 let mut bytes: Self::Output = [0; Self::SIZE];
-                #serialize
+                self.serialize_into(&mut bytes);
                 bytes
+            }
+
+            #[inline]
+            fn serialize_into(&self, bytes: &mut Self::Output) {
+                #serialize
             }
 
             #[inline]
