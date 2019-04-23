@@ -22,7 +22,7 @@ struct MyStruct {
 Add `desse` in your `Cargo.toml`'s `dependencies` section.
 ```
 [dependencies]
-desse = "0.1"
+desse = "0.2"
 ```
 
 `Desse` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive` macro. This
