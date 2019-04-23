@@ -1,6 +1,6 @@
 [package]
 name = "desse"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Devashish Dixit <devashishdxt@gmail.com>"]
 license = "MIT"
 description = "Ultra fast binary serialization and deserialization for types with size known at compile time."

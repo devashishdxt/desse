@@ -8,10 +8,10 @@ will not be allowed if it degrades performance without sufficient feature additi
 
 Below is a high level development plan for `desse` crate:
 
-### Phase 1: Minimum Viable Product (`v0.1.*`)
+### ~~Phase 1: Minimum Viable Product (`v0.1.*`)~~
 
 - ~~Serialization and deserialization of `struct`s with constant size (known at compile time)~~
-- Serialization and deserialization of `enum`s with constant size (known at compile time)
+- ~~Serialization and deserialization of `enum`s with constant size (known at compile time)~~
 
 ### Phase 2: Binary Encoding Scheme (`v0.2.*`)
 
