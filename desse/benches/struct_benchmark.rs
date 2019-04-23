@@ -16,7 +16,7 @@ struct MyDesseStruct {
 #[derive(Desse, DesseSized)]
 enum MyDesseEnum {
     Variant1,
-    Variant2,
+    Variant2(u16),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -29,7 +29,7 @@ struct MySerdeStruct {
 #[derive(Serialize, Deserialize)]
 enum MySerdeEnum {
     Variant1,
-    Variant2,
+    Variant2(u16),
 }
 
 #[allow(unused_must_use)]
@@ -41,7 +41,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 let my_struct: MyDesseStruct = MyDesseStruct {
                     a: 253,
                     b: 64016,
-                    c: MyDesseEnum::Variant1,
+                    c: MyDesseEnum::Variant2(64016),
                 };
                 black_box(Desse::serialize(black_box(&my_struct)));
             })
@@ -53,7 +53,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 let my_struct: MySerdeStruct = MySerdeStruct {
                     a: 253,
                     b: 64016,
-                    c: MySerdeEnum::Variant1,
+                    c: MySerdeEnum::Variant2(64016),
                 };
                 black_box(serialize_into(&mut buffer, black_box(&my_struct)));
             })
@@ -64,13 +64,13 @@ fn criterion_benchmark(c: &mut Criterion) {
         "struct::deserialize",
         Benchmark::new("desse::deserialize", |b| {
             b.iter(|| {
-                let bytes: [u8; 4] = [253, 16, 250, 0];
+                let bytes: [u8; 6] = [253, 16, 250, 1, 16, 250];
                 black_box(MyDesseStruct::deserialize_from(black_box(&bytes)));
             })
         })
         .with_function("bincode::deserialize", |b| {
             b.iter(|| {
-                let bytes: [u8; 7] = [253, 16, 250, 0, 0, 0, 0];
+                let bytes: [u8; 9] = [253, 16, 250, 1, 0, 0, 0, 16, 250];
                 black_box(deserialize::<MySerdeStruct>(black_box(&bytes)));
             })
         }),

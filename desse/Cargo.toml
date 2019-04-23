@@ -17,7 +17,6 @@ travis-ci = { repository = "devashishdxt/desse" }
 [lib]
 name = "desse"
 path = "src/lib.rs"
-doctest = false
 
 [dependencies]
 desse-derive = { path = "../desse-derive", optional = true }

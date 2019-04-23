@@ -18,7 +18,6 @@ enum NonUnitEnum {
 }
 
 fn main() {
-    println!("Start");
     let my_enum = NonUnitEnum::Variant3 {
         a: random(),
         b: MyEnum::Variant3(random()),
