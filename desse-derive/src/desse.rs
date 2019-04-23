@@ -24,6 +24,7 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
     quote! {
         #[automatically_derived]
         #[allow(unused_qualifications)]
+        #[allow(unused)]
         impl Desse for #name {
             type Output = [u8; Self::SIZE];
 

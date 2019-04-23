@@ -18,6 +18,7 @@ pub fn get_desse_sized_impl(input: DeriveInput) -> TokenStream {
     quote! {
         #[automatically_derived]
         #[allow(unused_qualifications)]
+        #[allow(unused)]
         impl DesseSized for #name {
             const SIZE: usize = #expr;
         }

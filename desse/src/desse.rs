@@ -13,7 +13,7 @@ pub trait Desse {
     fn deserialize_from(bytes: &Self::Output) -> Self;
 }
 
-/// Any trait must implement this to implement [`Desse`]
+/// Helper trait used to compute `SIZE` of a type at compile time
 pub trait DesseSized {
     /// Size of output byte array
     const SIZE: usize;
