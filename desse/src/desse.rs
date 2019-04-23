@@ -108,6 +108,108 @@ macro_rules! impl_desse_arr {
     };
 }
 
+macro_rules! impl_desse_arr_char {
+    ($num: expr) => {
+        impl Desse for [char; $num] {
+            type Output = [u8; Self::SIZE];
+
+            #[inline]
+            fn serialize(&self) -> Self::Output {
+                let mut bytes: Self::Output = [0; Self::SIZE];
+                self.serialize_into(&mut bytes);
+                bytes
+            }
+
+            #[inline]
+            fn serialize_into(&self, bytes: &mut Self::Output) {
+                let mut counter = 0;
+
+                for element in self {
+                    unsafe {
+                        Desse::serialize_into(
+                            element,
+                            &mut *(bytes[counter..(counter + <char>::SIZE)].as_mut_ptr()
+                                as *mut [u8; <char>::SIZE]),
+                        );
+                    }
+                    counter += <char>::SIZE;
+                }
+            }
+
+            #[inline]
+            fn deserialize_from(bytes: &Self::Output) -> Self {
+                let mut arr: Self = [0 as char; $num];
+
+                let mut counter = 0;
+
+                for i in 0..$num {
+                    unsafe {
+                        arr[i] = <char>::deserialize_from(
+                            &*(bytes[counter..(counter + <char>::SIZE)].as_ptr()
+                                as *const [u8; <char>::SIZE]),
+                        );
+                    }
+
+                    counter += <char>::SIZE;
+                }
+
+                arr
+            }
+        }
+    };
+}
+
+macro_rules! impl_desse_arr_bool {
+    ($num: expr) => {
+        impl Desse for [bool; $num] {
+            type Output = [u8; Self::SIZE];
+
+            #[inline]
+            fn serialize(&self) -> Self::Output {
+                let mut bytes: Self::Output = [0; Self::SIZE];
+                self.serialize_into(&mut bytes);
+                bytes
+            }
+
+            #[inline]
+            fn serialize_into(&self, bytes: &mut Self::Output) {
+                let mut counter = 0;
+
+                for element in self {
+                    unsafe {
+                        Desse::serialize_into(
+                            element,
+                            &mut *(bytes[counter..(counter + <bool>::SIZE)].as_mut_ptr()
+                                as *mut [u8; <bool>::SIZE]),
+                        );
+                    }
+                    counter += <bool>::SIZE;
+                }
+            }
+
+            #[inline]
+            fn deserialize_from(bytes: &Self::Output) -> Self {
+                let mut arr: Self = [false; $num];
+
+                let mut counter = 0;
+
+                for i in 0..$num {
+                    unsafe {
+                        arr[i] = <bool>::deserialize_from(
+                            &*(bytes[counter..(counter + <bool>::SIZE)].as_ptr()
+                                as *const [u8; <bool>::SIZE]),
+                        );
+                    }
+
+                    counter += <bool>::SIZE;
+                }
+
+                arr
+            }
+        }
+    };
+}
+
 impl_desse!(u8);
 impl_desse!(u16);
 impl_desse!(u32);
@@ -119,6 +221,52 @@ impl_desse!(i16);
 impl_desse!(i32);
 impl_desse!(i64);
 impl_desse!(i128);
+
+impl DesseSized for bool {
+    const SIZE: usize = core::mem::size_of::<Self>();
+}
+
+impl Desse for bool {
+    type Output = [u8; Self::SIZE];
+
+    #[inline]
+    fn serialize(&self) -> Self::Output {
+        (*self as u8).to_le_bytes()
+    }
+
+    #[inline]
+    fn serialize_into(&self, bytes: &mut Self::Output) {
+        bytes.copy_from_slice(&self.serialize());
+    }
+
+    #[inline]
+    fn deserialize_from(bytes: &Self::Output) -> Self {
+        u8::from_le_bytes(*bytes) != 0
+    }
+}
+
+impl DesseSized for char {
+    const SIZE: usize = core::mem::size_of::<Self>();
+}
+
+impl Desse for char {
+    type Output = [u8; Self::SIZE];
+
+    #[inline]
+    fn serialize(&self) -> Self::Output {
+        (*self as u32).to_le_bytes()
+    }
+
+    #[inline]
+    fn serialize_into(&self, bytes: &mut Self::Output) {
+        bytes.copy_from_slice(&self.serialize());
+    }
+
+    #[inline]
+    fn deserialize_from(bytes: &Self::Output) -> Self {
+        unsafe { core::char::from_u32_unchecked(u32::from_le_bytes(*bytes)) }
+    }
+}
 
 impl_desse_size_generic_arr!(1);
 impl_desse_size_generic_arr!(2);
@@ -152,6 +300,72 @@ impl_desse_size_generic_arr!(29);
 impl_desse_size_generic_arr!(30);
 impl_desse_size_generic_arr!(31);
 impl_desse_size_generic_arr!(32);
+
+impl_desse_arr_bool!(1);
+impl_desse_arr_bool!(2);
+impl_desse_arr_bool!(3);
+impl_desse_arr_bool!(4);
+impl_desse_arr_bool!(5);
+impl_desse_arr_bool!(6);
+impl_desse_arr_bool!(7);
+impl_desse_arr_bool!(8);
+impl_desse_arr_bool!(9);
+impl_desse_arr_bool!(10);
+impl_desse_arr_bool!(11);
+impl_desse_arr_bool!(12);
+impl_desse_arr_bool!(13);
+impl_desse_arr_bool!(14);
+impl_desse_arr_bool!(15);
+impl_desse_arr_bool!(16);
+impl_desse_arr_bool!(17);
+impl_desse_arr_bool!(18);
+impl_desse_arr_bool!(19);
+impl_desse_arr_bool!(20);
+impl_desse_arr_bool!(21);
+impl_desse_arr_bool!(22);
+impl_desse_arr_bool!(23);
+impl_desse_arr_bool!(24);
+impl_desse_arr_bool!(25);
+impl_desse_arr_bool!(26);
+impl_desse_arr_bool!(27);
+impl_desse_arr_bool!(28);
+impl_desse_arr_bool!(29);
+impl_desse_arr_bool!(30);
+impl_desse_arr_bool!(31);
+impl_desse_arr_bool!(32);
+
+impl_desse_arr_char!(1);
+impl_desse_arr_char!(2);
+impl_desse_arr_char!(3);
+impl_desse_arr_char!(4);
+impl_desse_arr_char!(5);
+impl_desse_arr_char!(6);
+impl_desse_arr_char!(7);
+impl_desse_arr_char!(8);
+impl_desse_arr_char!(9);
+impl_desse_arr_char!(10);
+impl_desse_arr_char!(11);
+impl_desse_arr_char!(12);
+impl_desse_arr_char!(13);
+impl_desse_arr_char!(14);
+impl_desse_arr_char!(15);
+impl_desse_arr_char!(16);
+impl_desse_arr_char!(17);
+impl_desse_arr_char!(18);
+impl_desse_arr_char!(19);
+impl_desse_arr_char!(20);
+impl_desse_arr_char!(21);
+impl_desse_arr_char!(22);
+impl_desse_arr_char!(23);
+impl_desse_arr_char!(24);
+impl_desse_arr_char!(25);
+impl_desse_arr_char!(26);
+impl_desse_arr_char!(27);
+impl_desse_arr_char!(28);
+impl_desse_arr_char!(29);
+impl_desse_arr_char!(30);
+impl_desse_arr_char!(31);
+impl_desse_arr_char!(32);
 
 impl_desse_arr!([u8; 1]);
 impl_desse_arr!([u8; 2]);
@@ -498,6 +712,9 @@ mod tests {
         };
     }
 
+    impl_desse_test!(bool, check_primitive_bool);
+    impl_desse_test!(char, check_primitive_char);
+
     impl_desse_test!(u8, check_primitive_u8);
     impl_desse_test!(u16, check_primitive_u16);
     impl_desse_test!(u32, check_primitive_u32);
@@ -509,6 +726,72 @@ mod tests {
     impl_desse_test!(i32, check_primitive_i32);
     impl_desse_test!(i64, check_primitive_i64);
     impl_desse_test!(i128, check_primitive_i128);
+
+    impl_desse_test!([bool; 1], check_arr_bool_1);
+    impl_desse_test!([bool; 2], check_arr_bool_2);
+    impl_desse_test!([bool; 3], check_arr_bool_3);
+    impl_desse_test!([bool; 4], check_arr_bool_4);
+    impl_desse_test!([bool; 5], check_arr_bool_5);
+    impl_desse_test!([bool; 6], check_arr_bool_6);
+    impl_desse_test!([bool; 7], check_arr_bool_7);
+    impl_desse_test!([bool; 8], check_arr_bool_8);
+    impl_desse_test!([bool; 9], check_arr_bool_9);
+    impl_desse_test!([bool; 10], check_arr_bool_10);
+    impl_desse_test!([bool; 11], check_arr_bool_11);
+    impl_desse_test!([bool; 12], check_arr_bool_12);
+    impl_desse_test!([bool; 13], check_arr_bool_13);
+    impl_desse_test!([bool; 14], check_arr_bool_14);
+    impl_desse_test!([bool; 15], check_arr_bool_15);
+    impl_desse_test!([bool; 16], check_arr_bool_16);
+    impl_desse_test!([bool; 17], check_arr_bool_17);
+    impl_desse_test!([bool; 18], check_arr_bool_18);
+    impl_desse_test!([bool; 19], check_arr_bool_19);
+    impl_desse_test!([bool; 20], check_arr_bool_20);
+    impl_desse_test!([bool; 21], check_arr_bool_21);
+    impl_desse_test!([bool; 22], check_arr_bool_22);
+    impl_desse_test!([bool; 23], check_arr_bool_23);
+    impl_desse_test!([bool; 24], check_arr_bool_24);
+    impl_desse_test!([bool; 25], check_arr_bool_25);
+    impl_desse_test!([bool; 26], check_arr_bool_26);
+    impl_desse_test!([bool; 27], check_arr_bool_27);
+    impl_desse_test!([bool; 28], check_arr_bool_28);
+    impl_desse_test!([bool; 29], check_arr_bool_29);
+    impl_desse_test!([bool; 30], check_arr_bool_30);
+    impl_desse_test!([bool; 31], check_arr_bool_31);
+    impl_desse_test!([bool; 32], check_arr_bool_32);
+
+    impl_desse_test!([char; 1], check_arr_char_1);
+    impl_desse_test!([char; 2], check_arr_char_2);
+    impl_desse_test!([char; 3], check_arr_char_3);
+    impl_desse_test!([char; 4], check_arr_char_4);
+    impl_desse_test!([char; 5], check_arr_char_5);
+    impl_desse_test!([char; 6], check_arr_char_6);
+    impl_desse_test!([char; 7], check_arr_char_7);
+    impl_desse_test!([char; 8], check_arr_char_8);
+    impl_desse_test!([char; 9], check_arr_char_9);
+    impl_desse_test!([char; 10], check_arr_char_10);
+    impl_desse_test!([char; 11], check_arr_char_11);
+    impl_desse_test!([char; 12], check_arr_char_12);
+    impl_desse_test!([char; 13], check_arr_char_13);
+    impl_desse_test!([char; 14], check_arr_char_14);
+    impl_desse_test!([char; 15], check_arr_char_15);
+    impl_desse_test!([char; 16], check_arr_char_16);
+    impl_desse_test!([char; 17], check_arr_char_17);
+    impl_desse_test!([char; 18], check_arr_char_18);
+    impl_desse_test!([char; 19], check_arr_char_19);
+    impl_desse_test!([char; 20], check_arr_char_20);
+    impl_desse_test!([char; 21], check_arr_char_21);
+    impl_desse_test!([char; 22], check_arr_char_22);
+    impl_desse_test!([char; 23], check_arr_char_23);
+    impl_desse_test!([char; 24], check_arr_char_24);
+    impl_desse_test!([char; 25], check_arr_char_25);
+    impl_desse_test!([char; 26], check_arr_char_26);
+    impl_desse_test!([char; 27], check_arr_char_27);
+    impl_desse_test!([char; 28], check_arr_char_28);
+    impl_desse_test!([char; 29], check_arr_char_29);
+    impl_desse_test!([char; 30], check_arr_char_30);
+    impl_desse_test!([char; 31], check_arr_char_31);
+    impl_desse_test!([char; 32], check_arr_char_32);
 
     impl_desse_test!([u8; 1], check_arr_u8_1);
     impl_desse_test!([u8; 2], check_arr_u8_2);
