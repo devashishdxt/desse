@@ -2,7 +2,7 @@
 name = "desse"
 version = "0.2.1"
 authors = ["Devashish Dixit <devashishdxt@gmail.com>"]
-license = "MIT"
+license = "MIT/Apache-2.0"
 description = "Ultra fast binary serialization and deserialization for types with size known at compile time."
 homepage = "https://github.com/devashishdxt/desse"
 repository = "https://github.com/devashishdxt/desse"
