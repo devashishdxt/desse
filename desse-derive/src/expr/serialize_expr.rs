@@ -35,13 +35,17 @@ impl SerializeExpr {
                             .unwrap();
 
                     exprs.push(quote! {
-                        (&mut bytes[ (#counter)..( #counter + <#field_type>::SIZE ) ]).copy_from_slice(&Desse::serialize(#field_ref));
+                        Desse::serialize_into(#field_ref, &mut *(bytes[(#counter)..(#counter + <#field_type>::SIZE)].as_mut_ptr() as *mut [u8; <#field_type>::SIZE]));
                     });
 
                     counter = quote! { #counter + <#field_type>::SIZE };
                 }
 
-                quote! { #(#exprs)* }
+                quote! {
+                    unsafe {
+                        #(#exprs)*
+                    }
+                }
             }
             Fields::Unnamed(unnamed_fields) => {
                 let mut exprs = Vec::with_capacity(unnamed_fields.unnamed.len());
@@ -54,13 +58,17 @@ impl SerializeExpr {
                         TokenStream::from_str(&format!("{}{}", container_prefix, i)).unwrap();
 
                     exprs.push(quote! {
-                        (&mut bytes[ (#counter)..( #counter + <#field_type>::SIZE ) ]).copy_from_slice(&Desse::serialize(#field_ref));
+                        Desse::serialize_into(#field_ref, &mut *(bytes[(#counter)..(#counter + <#field_type>::SIZE)].as_mut_ptr() as *mut [u8; <#field_type>::SIZE]));
                     });
 
                     counter = quote! { #counter + <#field_type>::SIZE };
                 }
 
-                quote! { #(#exprs)* }
+                quote! {
+                    unsafe {
+                        #(#exprs)*
+                    }
+                }
             }
         }
     }
@@ -118,7 +126,9 @@ impl SerializeExpr {
 
             let variant_name = &variant.ident;
             let variant_init_expr = quote! {
-                (&mut bytes[0..<#size_type>::SIZE]).copy_from_slice(&Desse::serialize(&(#index as #size_type)));
+                unsafe {
+                    Desse::serialize_into(&(#index as #size_type), &mut *(bytes[0..<#size_type>::SIZE].as_mut_ptr() as *mut [u8; <#size_type>::SIZE]));
+                }
             };
             let variant_impl_expr = Self::get_serialize_expr_for_fields(
                 field_prefix,

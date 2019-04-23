@@ -15,11 +15,15 @@ impl Desse for MyStruct {
 
     fn serialize(&self) -> Self::Output {
         let mut bytes: Self::Output = Default::default();
-
-        (&mut bytes[0..1]).copy_from_slice(&Desse::serialize(&self.a));
-        (&mut bytes[1..3]).copy_from_slice(&Desse::serialize(&self.b));
-
+        self.serialize_into(&mut bytes);
         bytes
+    }
+
+    fn serialize_into(&self, bytes: &mut Self::Output) {
+        unsafe {
+            Desse::serialize_into(&self.a, &mut *(bytes[0..1].as_mut_ptr() as *mut [u8; 1]));
+            Desse::serialize_into(&self.b, &mut *(bytes[1..3].as_mut_ptr() as *mut [u8; 2]));
+        }
     }
 
     fn deserialize_from(bytes: &Self::Output) -> Self {

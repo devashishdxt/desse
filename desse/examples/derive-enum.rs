@@ -12,12 +12,13 @@ enum MyEnum {
 #[allow(unused)]
 #[derive(Debug, PartialEq, DesseSized, Desse)]
 enum NonUnitEnum {
-    Variant1,
+    Variant1(u128),
     Variant2(u8, u16),
     Variant3 { a: u32, b: MyEnum },
 }
 
 fn main() {
+    println!("Start");
     let my_enum = NonUnitEnum::Variant3 {
         a: random(),
         b: MyEnum::Variant3(random()),

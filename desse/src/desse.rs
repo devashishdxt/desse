@@ -6,6 +6,9 @@ pub trait Desse: DesseSized {
     /// Serializes current object
     fn serialize(&self) -> Self::Output;
 
+    /// Serializes current object into bytes
+    fn serialize_into(&self, bytes: &mut Self::Output);
+
     /// Deserializes an object
     fn deserialize_from(bytes: &Self::Output) -> Self;
 }
@@ -28,6 +31,11 @@ macro_rules! impl_desse {
             #[inline]
             fn serialize(&self) -> Self::Output {
                 self.to_le_bytes()
+            }
+
+            #[inline]
+            fn serialize_into(&self, bytes: &mut Self::Output) {
+                bytes.copy_from_slice(&self.serialize());
             }
 
             #[inline]
@@ -57,21 +65,29 @@ macro_rules! impl_desse_arr {
             #[inline]
             fn serialize(&self) -> Self::Output {
                 let mut bytes: Self::Output = [0; Self::SIZE];
-
-                let mut counter = 0;
-
-                for element in self {
-                    (&mut bytes[counter..(counter + <$type>::SIZE)])
-                        .copy_from_slice(&Desse::serialize(element));
-                    counter += <$type>::SIZE;
-                }
-
+                self.serialize_into(&mut bytes);
                 bytes
             }
 
             #[inline]
+            fn serialize_into(&self, bytes: &mut Self::Output) {
+                let mut counter = 0;
+
+                for element in self {
+                    unsafe {
+                        Desse::serialize_into(
+                            element,
+                            &mut *(bytes[counter..(counter + <$type>::SIZE)].as_mut_ptr()
+                                as *mut [u8; <$type>::SIZE]),
+                        );
+                    }
+                    counter += <$type>::SIZE;
+                }
+            }
+
+            #[inline]
             fn deserialize_from(bytes: &Self::Output) -> Self {
-                let mut arr: Self = Default::default();
+                let mut arr: Self = [0; $num];
 
                 let mut counter = 0;
 
