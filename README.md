@@ -25,13 +25,13 @@ Add `desse` in your `Cargo.toml`'s `dependencies` section.
 desse = "0.1"
 ```
 
-`Desse` trait can be implemented for any struct (whose size is known at compile time) using `derive` macro. This
+`Desse` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive` macro. This
 crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for implementing `Desse`
 trait.
 ```
 use desse::{Desse, DesseSized};
 
-#[derive(Desse, DesseSized)]
+#[derive(Debug, PartialEq, Desse, DesseSized)]
 struct MyStruct {
     a: u8,
     b: u16,
@@ -60,41 +60,41 @@ if it improves performance.
 Below are the benchmark results of comparison between `desse` and `bincode` serializing and deserializing same `struct`:
 ```
 struct::serialize/desse::serialize
-                        time:   [1.0707 ns 1.0733 ns 1.0765 ns]
-                        change: [-0.4340% +1.0979% +2.8290%] (p = 0.18 > 0.05)
+                        time:   [1.6228 ns 1.6326 ns 1.6434 ns]
+                        change: [-1.1985% +0.0554% +1.2769%] (p = 0.94 > 0.05)
                         No change in performance detected.
-Found 13 outliers among 100 measurements (13.00%)
-  3 (3.00%) high mild
-  10 (10.00%) high severe
+Found 8 outliers among 100 measurements (8.00%)
+  2 (2.00%) high mild
+  6 (6.00%) high severe
 
 struct::serialize/bincode::serialize
-                        time:   [16.005 ns 16.042 ns 16.081 ns]
-                        change: [-1.7999% -0.5179% +0.8202%] (p = 0.45 > 0.05)
+                        time:   [19.991 ns 20.081 ns 20.201 ns]
+                        change: [-1.0739% +0.3569% +1.7361%] (p = 0.63 > 0.05)
                         No change in performance detected.
-Found 9 outliers among 100 measurements (9.00%)
-  4 (4.00%) high mild
-  5 (5.00%) high severe
+Found 12 outliers among 100 measurements (12.00%)
+  3 (3.00%) high mild
+  9 (9.00%) high severe
 
 struct::deserialize/desse::deserialize
-                        time:   [1.3383 ns 1.3433 ns 1.3503 ns]
-                        change: [-1.4627% -0.0804% +1.4476%] (p = 0.92 > 0.05)
+                        time:   [1.6063 ns 1.6101 ns 1.6144 ns]
+                        change: [-1.3079% -0.1278% +1.0394%] (p = 0.84 > 0.05)
                         No change in performance detected.
 Found 7 outliers among 100 measurements (7.00%)
   1 (1.00%) high mild
   6 (6.00%) high severe
 
 struct::deserialize/bincode::deserialize
-                        time:   [15.020 ns 15.069 ns 15.133 ns]
-                        change: [-1.0730% +0.2426% +1.5766%] (p = 0.74 > 0.05)
+                        time:   [22.004 ns 22.094 ns 22.209 ns]
+                        change: [-1.1573% +0.0698% +1.3631%] (p = 0.92 > 0.05)
                         No change in performance detected.
 Found 9 outliers among 100 measurements (9.00%)
-  1 (1.00%) high mild
-  8 (8.00%) high severe
+  3 (3.00%) high mild
+  6 (6.00%) high severe
 ```
 
-It is clear from above benchmarks that `bincode` takes `16.042 ns` on an average for serialization whereas `desse` takes
-`1.0733 ns`. The results are also similar for deserialization where `bincode` takes `15.069 ns` and `desse` takes
-`1.3433 ns`.
+It is clear from above benchmarks that `bincode` takes `20.081 ns` on an average for serialization whereas `desse` takes
+`1.6326 ns`. The results are also similar for deserialization where `bincode` takes `22.094 ns` and `desse` takes
+`1.6101 ns`.
 
 You can run benchmarks by running following command:
 ```

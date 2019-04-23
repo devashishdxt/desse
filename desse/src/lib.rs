@@ -20,19 +20,14 @@
 //! `Desse::serialize` will serialize this struct in `[u8; 3]` where `3` is the sum of sizes of `u8` and `u16`.
 //!
 //! ## Usage
-//! Add `desse` in your `Cargo.toml`'s `dependencies` section.
-//! ```
-//! [dependencies]
-//! desse = "0.1"
-//! ```
 //!
-//! `Desse` trait can be implemented for any struct (whose size is known at compile time) using `derive` macro. This
-//! crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for implementing `Desse`
-//! trait.
+//! `Desse` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive` macro.
+//! This crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for implementing
+//! `Desse` trait.
 //! ```
 //! use desse::{Desse, DesseSized};
 //!
-//! #[derive(Desse, DesseSized)]
+//! #[derive(Debug, PartialEq, Desse, DesseSized)]
 //! struct MyStruct {
 //!     a: u8,
 //!     b: u16,
@@ -43,6 +38,14 @@
 //! struct.
 //!
 //! ```
+//! # use desse::{Desse, DesseSized};
+//! #
+//! # #[derive(Debug, PartialEq, Desse, DesseSized)]
+//! # struct MyStruct {
+//! #     a: u8,
+//! #     b: u16,
+//! # }
+//! #
 //! let my_struct = MyStruct { a: 5, b: 1005 };
 //! let serialized: [u8; 3] = my_struct.serialize();
 //! let new_struct = MyStruct::deserialize_from(&serialized);
