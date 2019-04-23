@@ -1,5 +1,5 @@
 /// Any type must implement this trait for serialization and deserialization
-pub trait Desse: DesseSized {
+pub trait Desse {
     /// Type of output
     type Output;
 
@@ -14,7 +14,7 @@ pub trait Desse: DesseSized {
 }
 
 /// Any trait must implement this to implement [`Desse`]
-pub trait DesseSized: Sized {
+pub trait DesseSized {
     /// Size of output byte array
     const SIZE: usize;
 }
