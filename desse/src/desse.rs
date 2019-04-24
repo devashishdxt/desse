@@ -1,5 +1,7 @@
+use crate::{ErrorKind, Result};
+
 /// Any type must implement this trait for serialization and deserialization
-pub trait Desse {
+pub trait Desse: Sized {
     /// Type of output
     type Output;
 
@@ -10,7 +12,7 @@ pub trait Desse {
     fn serialize_into(&self, bytes: &mut Self::Output);
 
     /// Deserializes an object
-    fn deserialize_from(bytes: &Self::Output) -> Self;
+    fn deserialize_from(bytes: &Self::Output) -> Result<Self>;
 }
 
 /// Helper trait used to compute `SIZE` of a type at compile time
@@ -39,8 +41,8 @@ macro_rules! impl_desse {
             }
 
             #[inline]
-            fn deserialize_from(bytes: &Self::Output) -> Self {
-                Self::from_le_bytes(*bytes)
+            fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
+                Ok(Self::from_le_bytes(*bytes))
             }
         }
     };
@@ -86,7 +88,7 @@ macro_rules! impl_desse_arr {
             }
 
             #[inline]
-            fn deserialize_from(bytes: &Self::Output) -> Self {
+            fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
                 let mut arr: Self = [0; $num];
 
                 let mut counter = 0;
@@ -96,13 +98,13 @@ macro_rules! impl_desse_arr {
                         arr[i] = <$type>::deserialize_from(
                             &*(bytes[counter..(counter + <$type>::SIZE)].as_ptr()
                                 as *const [u8; <$type>::SIZE]),
-                        );
+                        )?;
                     }
 
                     counter += <$type>::SIZE;
                 }
 
-                arr
+                Ok(arr)
             }
         }
     };
@@ -137,7 +139,7 @@ macro_rules! impl_desse_arr_char {
             }
 
             #[inline]
-            fn deserialize_from(bytes: &Self::Output) -> Self {
+            fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
                 let mut arr: Self = [0 as char; $num];
 
                 let mut counter = 0;
@@ -147,13 +149,13 @@ macro_rules! impl_desse_arr_char {
                         arr[i] = <char>::deserialize_from(
                             &*(bytes[counter..(counter + <char>::SIZE)].as_ptr()
                                 as *const [u8; <char>::SIZE]),
-                        );
+                        )?;
                     }
 
                     counter += <char>::SIZE;
                 }
 
-                arr
+                Ok(arr)
             }
         }
     };
@@ -188,7 +190,7 @@ macro_rules! impl_desse_arr_bool {
             }
 
             #[inline]
-            fn deserialize_from(bytes: &Self::Output) -> Self {
+            fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
                 let mut arr: Self = [false; $num];
 
                 let mut counter = 0;
@@ -198,13 +200,13 @@ macro_rules! impl_desse_arr_bool {
                         arr[i] = <bool>::deserialize_from(
                             &*(bytes[counter..(counter + <bool>::SIZE)].as_ptr()
                                 as *const [u8; <bool>::SIZE]),
-                        );
+                        )?;
                     }
 
                     counter += <bool>::SIZE;
                 }
 
-                arr
+                Ok(arr)
             }
         }
     };
@@ -240,8 +242,8 @@ impl Desse for bool {
     }
 
     #[inline]
-    fn deserialize_from(bytes: &Self::Output) -> Self {
-        u8::from_le_bytes(*bytes) != 0
+    fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
+        Ok(u8::from_le_bytes(*bytes) != 0)
     }
 }
 
@@ -263,8 +265,11 @@ impl Desse for char {
     }
 
     #[inline]
-    fn deserialize_from(bytes: &Self::Output) -> Self {
-        unsafe { core::char::from_u32_unchecked(u32::from_le_bytes(*bytes)) }
+    fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
+        match core::char::from_u32(u32::from_le_bytes(*bytes)) {
+            None => Err(ErrorKind::InvalidChar.into()),
+            Some(c) => Ok(c),
+        }
     }
 }
 
@@ -706,7 +711,7 @@ mod tests {
             #[test]
             fn $name() {
                 let num: $type = rand::random::<$type>();
-                let new_num = <$type>::deserialize_from(&Desse::serialize(&num));
+                let new_num = <$type>::deserialize_from(&Desse::serialize(&num)).unwrap();
                 assert_eq!(num, new_num, "Invalid serialization / deserialization")
             }
         };

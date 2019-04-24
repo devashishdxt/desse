@@ -15,10 +15,10 @@ impl DeserializeExpr {
         fields: &Fields,
     ) -> TokenStream {
         match fields {
-            Fields::Unit => quote! { #container_name },
+            Fields::Unit => quote! { Ok(#container_name) },
             Fields::Named(named_fields) => {
                 if named_fields.named.is_empty() {
-                    quote! { #container_name {} }
+                    quote! { Ok(#container_name {}) }
                 } else {
                     let mut exprs = Vec::with_capacity(named_fields.named.len());
                     let mut counter = quote! { #init_counter };
@@ -31,7 +31,7 @@ impl DeserializeExpr {
                         let field_type = &field.ty;
 
                         exprs.push(quote! {
-                            #field_name: <#field_type>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))
+                            #field_name: <#field_type>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))?
                         });
 
                         counter = quote! { #counter + <#field_type>::SIZE };
@@ -39,16 +39,16 @@ impl DeserializeExpr {
 
                     quote! {
                         unsafe {
-                            #container_name {
+                            Ok(#container_name {
                                 #(#exprs),*
-                            }
+                            })
                         }
                     }
                 }
             }
             Fields::Unnamed(unnamed_fields) => {
                 if unnamed_fields.unnamed.is_empty() {
-                    quote! { #container_name() }
+                    quote! { Ok(#container_name()) }
                 } else {
                     let mut exprs = Vec::with_capacity(unnamed_fields.unnamed.len());
                     let mut counter = quote! { #init_counter };
@@ -57,7 +57,7 @@ impl DeserializeExpr {
                         let field_type = &field.ty;
 
                         exprs.push(quote! {
-                            <#field_type>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))
+                            <#field_type>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))?
                         });
 
                         counter = quote! { #counter + <#field_type>::SIZE };
@@ -65,7 +65,7 @@ impl DeserializeExpr {
 
                     quote! {
                         unsafe {
-                            #container_name(#(#exprs),*)
+                            Ok(#container_name(#(#exprs),*))
                         }
                     }
                 }
@@ -86,7 +86,7 @@ impl DeserializeExpr {
         let mut match_exprs = Vec::with_capacity(variant_count);
 
         let variant_expr = quote! {
-            let variant = unsafe { <#size_type>::deserialize_from(&*(bytes[0..<#size_type>::SIZE].as_ptr() as *const [u8; <#size_type>::SIZE])) };
+            let variant = unsafe { <#size_type>::deserialize_from(&*(bytes[0..<#size_type>::SIZE].as_ptr() as *const [u8; <#size_type>::SIZE]))? };
         };
 
         for (i, variant) in enum_data.variants.iter().enumerate() {
