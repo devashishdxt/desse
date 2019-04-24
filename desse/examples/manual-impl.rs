@@ -1,4 +1,4 @@
-use desse::{Desse, DesseSized};
+use desse::{Desse, DesseSized, Result};
 
 #[derive(Debug, Default, PartialEq)]
 struct MyStruct {
@@ -26,12 +26,12 @@ impl Desse for MyStruct {
         }
     }
 
-    fn deserialize_from(bytes: &Self::Output) -> Self {
+    fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
         unsafe {
-            MyStruct {
-                a: <u8>::deserialize_from(&*(bytes[0..1].as_ptr() as *const [u8; 1])),
-                b: <u16>::deserialize_from(&*(bytes[1..3].as_ptr() as *const [u8; 2])),
-            }
+            Ok(MyStruct {
+                a: <u8>::deserialize_from(&*(bytes[0..1].as_ptr() as *const [u8; 1]))?,
+                b: <u16>::deserialize_from(&*(bytes[1..3].as_ptr() as *const [u8; 2]))?,
+            })
         }
     }
 }
@@ -47,7 +47,7 @@ fn main() {
     println!("Object       : {:?}", my_struct);
     println!("Serialized   : {:?}", serialized);
 
-    let new_struct = MyStruct::deserialize_from(&serialized);
+    let new_struct = MyStruct::deserialize_from(&serialized).unwrap();
 
     println!("De-serialized: {:?}", new_struct);
 

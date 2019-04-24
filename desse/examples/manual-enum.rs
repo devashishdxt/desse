@@ -1,6 +1,6 @@
 use rand::random;
 
-use desse::{Desse, DesseSized};
+use desse::{Desse, DesseSized, Result};
 
 #[allow(unused)]
 #[derive(Debug, PartialEq, DesseSized)]
@@ -38,22 +38,23 @@ impl Desse for MyEnum {
     }
 
     #[inline]
-    fn deserialize_from(bytes: &Self::Output) -> Self {
-        let variant = unsafe { <u8>::deserialize_from(&*(bytes[0..1].as_ptr() as *const [u8; 1])) };
+    fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
+        let variant =
+            unsafe { <u8>::deserialize_from(&*(bytes[0..1].as_ptr() as *const [u8; 1]))? };
 
         match variant {
-            0 => MyEnum::Variant1,
+            0 => Ok(MyEnum::Variant1),
             1 => unsafe {
-                MyEnum::Variant2(
-                    <u8>::deserialize_from(&*(bytes[1..2].as_ptr() as *const [u8; 1])),
-                    <u16>::deserialize_from(&*(bytes[2..4].as_ptr() as *const [u8; 2])),
-                )
+                Ok(MyEnum::Variant2(
+                    <u8>::deserialize_from(&*(bytes[1..2].as_ptr() as *const [u8; 1]))?,
+                    <u16>::deserialize_from(&*(bytes[2..4].as_ptr() as *const [u8; 2]))?,
+                ))
             },
             2 => unsafe {
-                MyEnum::Variant3 {
-                    a: <u32>::deserialize_from(&*(bytes[1..5].as_ptr() as *const [u8; 4])),
-                    b: <u32>::deserialize_from(&*(bytes[5..9].as_ptr() as *const [u8; 4])),
-                }
+                Ok(MyEnum::Variant3 {
+                    a: <u32>::deserialize_from(&*(bytes[1..5].as_ptr() as *const [u8; 4]))?,
+                    b: <u32>::deserialize_from(&*(bytes[5..9].as_ptr() as *const [u8; 4]))?,
+                })
             },
             _ => unreachable!(),
         }
@@ -68,5 +69,8 @@ fn main() {
 
     println! {"Serialized: {:?}", my_enum.serialize()};
 
-    assert_eq!(my_enum, MyEnum::deserialize_from(&my_enum.serialize()));
+    assert_eq!(
+        my_enum,
+        MyEnum::deserialize_from(&my_enum.serialize()).unwrap()
+    );
 }

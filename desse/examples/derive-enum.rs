@@ -29,7 +29,7 @@ fn main() {
     println!("Object       : {:?}", my_enum);
     println!("Serialized   : {:?}", serialized);
 
-    let new_enum = NonUnitEnum::deserialize_from(&serialized);
+    let new_enum = NonUnitEnum::deserialize_from(&serialized).unwrap();
 
     println!("De-serialized: {:?}", new_enum);
 

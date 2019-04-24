@@ -41,7 +41,7 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
             }
 
             #[inline]
-            fn deserialize_from(bytes: &Self::Output) -> Self {
+            fn deserialize_from(bytes: &Self::Output) -> desse::Result<Self> {
                 #deserialize
             }
         }

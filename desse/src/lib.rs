@@ -48,7 +48,7 @@
 //! #
 //! let my_struct = MyStruct { a: 5, b: 1005 };
 //! let serialized: [u8; 3] = my_struct.serialize();
-//! let new_struct = MyStruct::deserialize_from(&serialized);
+//! let new_struct = MyStruct::deserialize_from(&serialized).unwrap();
 //!
 //! assert_eq!(my_struct, new_struct);
 //! ```
@@ -59,8 +59,10 @@
 #![no_std]
 
 mod desse;
+mod error;
 
 pub use crate::desse::{Desse, DesseSized};
+pub use crate::error::{Error, ErrorKind, Result};
 
 #[cfg(feature = "derive")]
 pub use desse_derive::*;

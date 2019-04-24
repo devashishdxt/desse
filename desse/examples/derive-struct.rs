@@ -17,7 +17,7 @@ fn main() {
     println!("Object       : {:?}", my_struct);
     println!("Serialized   : {:?}", serialized);
 
-    let new_struct = MyStruct::deserialize_from(&serialized);
+    let new_struct = MyStruct::deserialize_from(&serialized).unwrap();
 
     println!("De-serialized: {:?}", new_struct);
 
