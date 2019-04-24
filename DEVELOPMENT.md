@@ -20,6 +20,7 @@ Below is a high level development plan for `desse` crate:
 
 - Develop a backwards compatible binary encoding scheme (implement as an optional feature).
 - Support for user defined encoding scheme.
+- ~~Better error handling during deserialization. `Desse::deserialize_from()` now returns `Result`.~~
 
 ### Phase 3: Generics (`v0.3.*`)
 
