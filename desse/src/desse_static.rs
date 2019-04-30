@@ -48,7 +48,7 @@ macro_rules! impl_desse_static {
     };
 }
 
-macro_rules! impl_desse_static_size_generic_arr {
+macro_rules! impl_desse_size_static_arr {
     ($num: expr) => {
         impl<T> DesseSized for [T; $num]
         where
@@ -273,38 +273,38 @@ impl DesseStatic for char {
     }
 }
 
-impl_desse_static_size_generic_arr!(1);
-impl_desse_static_size_generic_arr!(2);
-impl_desse_static_size_generic_arr!(3);
-impl_desse_static_size_generic_arr!(4);
-impl_desse_static_size_generic_arr!(5);
-impl_desse_static_size_generic_arr!(6);
-impl_desse_static_size_generic_arr!(7);
-impl_desse_static_size_generic_arr!(8);
-impl_desse_static_size_generic_arr!(9);
-impl_desse_static_size_generic_arr!(10);
-impl_desse_static_size_generic_arr!(11);
-impl_desse_static_size_generic_arr!(12);
-impl_desse_static_size_generic_arr!(13);
-impl_desse_static_size_generic_arr!(14);
-impl_desse_static_size_generic_arr!(15);
-impl_desse_static_size_generic_arr!(16);
-impl_desse_static_size_generic_arr!(17);
-impl_desse_static_size_generic_arr!(18);
-impl_desse_static_size_generic_arr!(19);
-impl_desse_static_size_generic_arr!(20);
-impl_desse_static_size_generic_arr!(21);
-impl_desse_static_size_generic_arr!(22);
-impl_desse_static_size_generic_arr!(23);
-impl_desse_static_size_generic_arr!(24);
-impl_desse_static_size_generic_arr!(25);
-impl_desse_static_size_generic_arr!(26);
-impl_desse_static_size_generic_arr!(27);
-impl_desse_static_size_generic_arr!(28);
-impl_desse_static_size_generic_arr!(29);
-impl_desse_static_size_generic_arr!(30);
-impl_desse_static_size_generic_arr!(31);
-impl_desse_static_size_generic_arr!(32);
+impl_desse_size_static_arr!(1);
+impl_desse_size_static_arr!(2);
+impl_desse_size_static_arr!(3);
+impl_desse_size_static_arr!(4);
+impl_desse_size_static_arr!(5);
+impl_desse_size_static_arr!(6);
+impl_desse_size_static_arr!(7);
+impl_desse_size_static_arr!(8);
+impl_desse_size_static_arr!(9);
+impl_desse_size_static_arr!(10);
+impl_desse_size_static_arr!(11);
+impl_desse_size_static_arr!(12);
+impl_desse_size_static_arr!(13);
+impl_desse_size_static_arr!(14);
+impl_desse_size_static_arr!(15);
+impl_desse_size_static_arr!(16);
+impl_desse_size_static_arr!(17);
+impl_desse_size_static_arr!(18);
+impl_desse_size_static_arr!(19);
+impl_desse_size_static_arr!(20);
+impl_desse_size_static_arr!(21);
+impl_desse_size_static_arr!(22);
+impl_desse_size_static_arr!(23);
+impl_desse_size_static_arr!(24);
+impl_desse_size_static_arr!(25);
+impl_desse_size_static_arr!(26);
+impl_desse_size_static_arr!(27);
+impl_desse_size_static_arr!(28);
+impl_desse_size_static_arr!(29);
+impl_desse_size_static_arr!(30);
+impl_desse_size_static_arr!(31);
+impl_desse_size_static_arr!(32);
 
 impl_desse_static_arr_bool!(1);
 impl_desse_static_arr_bool!(2);
