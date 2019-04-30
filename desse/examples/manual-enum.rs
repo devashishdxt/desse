@@ -1,6 +1,6 @@
 use rand::random;
 
-use desse::{Desse, DesseSized, Result};
+use desse::{DesseSized, DesseStatic, Result};
 
 #[allow(unused)]
 #[derive(Debug, PartialEq, DesseSized)]
@@ -10,7 +10,7 @@ enum MyEnum {
     Variant3 { a: u32, b: u32 },
 }
 
-impl Desse for MyEnum {
+impl DesseStatic for MyEnum {
     type Output = [u8; Self::SIZE];
 
     #[inline]
@@ -23,16 +23,16 @@ impl Desse for MyEnum {
     #[inline]
     fn serialize_into(&self, bytes: &mut Self::Output) {
         match self {
-            MyEnum::Variant1 => (&mut bytes[0..1]).copy_from_slice(&Desse::serialize(&0u8)),
+            MyEnum::Variant1 => (&mut bytes[0..1]).copy_from_slice(&DesseStatic::serialize(&0u8)),
             MyEnum::Variant2(ref a, ref b) => {
-                (&mut bytes[0..1]).copy_from_slice(&Desse::serialize(&1u8));
-                (&mut bytes[1..2]).copy_from_slice(&Desse::serialize(a));
-                (&mut bytes[2..4]).copy_from_slice(&Desse::serialize(b));
+                (&mut bytes[0..1]).copy_from_slice(&DesseStatic::serialize(&1u8));
+                (&mut bytes[1..2]).copy_from_slice(&DesseStatic::serialize(a));
+                (&mut bytes[2..4]).copy_from_slice(&DesseStatic::serialize(b));
             }
             MyEnum::Variant3 { ref a, ref b } => {
-                (&mut bytes[0..1]).copy_from_slice(&Desse::serialize(&2u8));
-                (&mut bytes[1..5]).copy_from_slice(&Desse::serialize(a));
-                (&mut bytes[5..9]).copy_from_slice(&Desse::serialize(b));
+                (&mut bytes[0..1]).copy_from_slice(&DesseStatic::serialize(&2u8));
+                (&mut bytes[1..5]).copy_from_slice(&DesseStatic::serialize(a));
+                (&mut bytes[5..9]).copy_from_slice(&DesseStatic::serialize(b));
             }
         }
     }

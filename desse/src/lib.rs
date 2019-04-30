@@ -17,30 +17,30 @@
 //! }
 //! ```
 //!
-//! `Desse::serialize` will serialize this struct in `[u8; 3]` where `3` is the sum of sizes of `u8` and `u16`.
+//! `DesseStatic::serialize` will serialize this struct in `[u8; 3]` where `3` is the sum of sizes of `u8` and `u16`.
 //!
 //! ## Usage
 //!
-//! `Desse` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive` macro.
-//! This crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for implementing
-//! `Desse` trait.
+//! `DesseStatic` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive`
+//! macro. This crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for
+//! implementing `DesseStatic` trait.
 //! ```
-//! use desse::{Desse, DesseSized};
+//! use desse::{DesseStatic, DesseSized};
 //!
-//! #[derive(Debug, PartialEq, Desse, DesseSized)]
+//! #[derive(Debug, PartialEq, DesseStatic, DesseSized)]
 //! struct MyStruct {
 //!     a: u8,
 //!     b: u16,
 //! }
 //! ```
 //!
-//! Now, you can use `Desse::serialize` and `Desse::deserialize_from` for serialization and deserialization of this
-//! struct.
+//! Now, you can use `DesseStatic::serialize` and `DesseStatic::deserialize_from` for serialization and deserialization
+//! of this struct.
 //!
 //! ```
-//! # use desse::{Desse, DesseSized};
+//! # use desse::{DesseStatic, DesseSized};
 //! #
-//! # #[derive(Debug, PartialEq, Desse, DesseSized)]
+//! # #[derive(Debug, PartialEq, DesseStatic, DesseSized)]
 //! # struct MyStruct {
 //! #     a: u8,
 //! #     b: u16,
@@ -53,15 +53,15 @@
 //! assert_eq!(my_struct, new_struct);
 //! ```
 //!
-//! Note that `Desse::serialize` returns an array of fixed length (`3` in above case) and `Desse::deserialize` takes
-//! reference to an array of fixed length as argument.
+//! Note that `DesseStatic::serialize` returns an array of fixed length (`3` in above case) and
+//! `DesseStatic::deserialize` takes reference to an array of fixed length as argument.
 
 #![no_std]
 
-mod desse;
+mod desse_static;
 mod error;
 
-pub use crate::desse::{Desse, DesseSized};
+pub use crate::desse_static::{DesseSized, DesseStatic};
 pub use crate::error::{Error, ErrorKind, Result};
 
 #[cfg(feature = "derive")]

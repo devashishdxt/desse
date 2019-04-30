@@ -6,7 +6,7 @@ use syn::DeriveInput;
 use crate::expr::{DeserializeExpr, SerializeExpr};
 
 /// Returns `Desse` trait implementation
-pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
+pub fn get_desse_static_impl(input: DeriveInput) -> TokenStream {
     let name = input.ident;
 
     let (serialize, deserialize) = match &input.data {
@@ -25,7 +25,7 @@ pub fn get_desse_impl(input: DeriveInput) -> TokenStream {
         #[automatically_derived]
         #[allow(unused_qualifications)]
         #[allow(unused)]
-        impl Desse for #name {
+        impl DesseStatic for #name {
             type Output = [u8; Self::SIZE];
 
             #[inline]

@@ -1,4 +1,4 @@
-use desse::{Desse, DesseSized, Result};
+use desse::{DesseSized, DesseStatic, Result};
 
 #[derive(Debug, Default, PartialEq)]
 struct MyStruct {
@@ -10,7 +10,7 @@ impl DesseSized for MyStruct {
     const SIZE: usize = <u8>::SIZE + <u16>::SIZE;
 }
 
-impl Desse for MyStruct {
+impl DesseStatic for MyStruct {
     type Output = [u8; <MyStruct>::SIZE];
 
     fn serialize(&self) -> Self::Output {
@@ -21,8 +21,8 @@ impl Desse for MyStruct {
 
     fn serialize_into(&self, bytes: &mut Self::Output) {
         unsafe {
-            Desse::serialize_into(&self.a, &mut *(bytes[0..1].as_mut_ptr() as *mut [u8; 1]));
-            Desse::serialize_into(&self.b, &mut *(bytes[1..3].as_mut_ptr() as *mut [u8; 2]));
+            DesseStatic::serialize_into(&self.a, &mut *(bytes[0..1].as_mut_ptr() as *mut [u8; 1]));
+            DesseStatic::serialize_into(&self.b, &mut *(bytes[1..3].as_mut_ptr() as *mut [u8; 2]));
         }
     }
 

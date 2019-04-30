@@ -1,6 +1,6 @@
-use desse::{Desse, DesseSized};
+use desse::{DesseSized, DesseStatic};
 
-#[derive(Debug, Default, PartialEq, Desse, DesseSized)]
+#[derive(Debug, Default, PartialEq, DesseStatic, DesseSized)]
 struct MyStruct {
     a: u8,
     b: u16,
