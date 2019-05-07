@@ -1,8 +1,8 @@
 use rand::random;
 
-use desse::{Desse, DesseSized};
+use desse::{DesseSized, DesseStatic};
 
-#[derive(Debug, PartialEq, DesseSized, Desse)]
+#[derive(Debug, PartialEq, DesseSized, DesseStatic)]
 enum MyEnum {
     Variant1,
     Variant2(u16),
@@ -10,7 +10,7 @@ enum MyEnum {
 }
 
 #[allow(unused)]
-#[derive(Debug, PartialEq, DesseSized, Desse)]
+#[derive(Debug, PartialEq, DesseSized, DesseStatic)]
 enum NonUnitEnum {
     Variant1(u128),
     Variant2(u8, u16),

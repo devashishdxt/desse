@@ -1,18 +1,18 @@
-use desse::{Desse, DesseSized};
+use desse::{DesseSized, DesseStatic};
 
-#[derive(Debug, PartialEq, Desse, DesseSized)]
+#[derive(Debug, PartialEq, DesseStatic, DesseSized)]
 struct Inner {
     a: u8,
     b: u16,
     c: MyEnum,
 }
 
-#[derive(Debug, PartialEq, Desse, DesseSized)]
+#[derive(Debug, PartialEq, DesseStatic, DesseSized)]
 struct MyStruct {
     inner: Inner,
 }
 
-#[derive(Debug, PartialEq, Desse, DesseSized)]
+#[derive(Debug, PartialEq, DesseStatic, DesseSized)]
 enum MyEnum {
     Variant1,
     Variant2,

@@ -4,16 +4,16 @@ extern crate serde_derive;
 use criterion::{black_box, criterion_group, criterion_main, Benchmark, Criterion};
 
 use bincode::{deserialize, serialize_into};
-use desse::{Desse, DesseSized};
+use desse::{DesseSized, DesseStatic};
 
-#[derive(Desse, DesseSized)]
+#[derive(DesseStatic, DesseSized)]
 struct MyDesseStruct {
     a: u8,
     b: u16,
     c: MyDesseEnum,
 }
 
-#[derive(Desse, DesseSized)]
+#[derive(DesseStatic, DesseSized)]
 enum MyDesseEnum {
     Variant1,
     Variant2(u16),
@@ -43,7 +43,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                     b: 64016,
                     c: MyDesseEnum::Variant2(64016),
                 };
-                black_box(Desse::serialize(black_box(&my_struct)));
+                black_box(DesseStatic::serialize(black_box(&my_struct)));
             })
         })
         .with_function("bincode::serialize", |b| {

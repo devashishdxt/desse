@@ -35,7 +35,7 @@ impl SerializeExpr {
                             .unwrap();
 
                     exprs.push(quote! {
-                        Desse::serialize_into(#field_ref, &mut *(bytes[(#counter)..(#counter + <#field_type>::SIZE)].as_mut_ptr() as *mut [u8; <#field_type>::SIZE]));
+                        DesseStatic::serialize_into(#field_ref, &mut *(bytes[(#counter)..(#counter + <#field_type>::SIZE)].as_mut_ptr() as *mut [u8; <#field_type>::SIZE]));
                     });
 
                     counter = quote! { #counter + <#field_type>::SIZE };
@@ -58,7 +58,7 @@ impl SerializeExpr {
                         TokenStream::from_str(&format!("{}{}", container_prefix, i)).unwrap();
 
                     exprs.push(quote! {
-                        Desse::serialize_into(#field_ref, &mut *(bytes[(#counter)..(#counter + <#field_type>::SIZE)].as_mut_ptr() as *mut [u8; <#field_type>::SIZE]));
+                        DesseStatic::serialize_into(#field_ref, &mut *(bytes[(#counter)..(#counter + <#field_type>::SIZE)].as_mut_ptr() as *mut [u8; <#field_type>::SIZE]));
                     });
 
                     counter = quote! { #counter + <#field_type>::SIZE };
@@ -127,7 +127,7 @@ impl SerializeExpr {
             let variant_name = &variant.ident;
             let variant_init_expr = quote! {
                 unsafe {
-                    Desse::serialize_into(&(#index as #size_type), &mut *(bytes[0..<#size_type>::SIZE].as_mut_ptr() as *mut [u8; <#size_type>::SIZE]));
+                    DesseStatic::serialize_into(&(#index as #size_type), &mut *(bytes[0..<#size_type>::SIZE].as_mut_ptr() as *mut [u8; <#size_type>::SIZE]));
                 }
             };
             let variant_impl_expr = Self::get_serialize_expr_for_fields(

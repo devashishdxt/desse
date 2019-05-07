@@ -16,7 +16,7 @@ struct MyStruct {
 }
 ```
 
-`Desse::serialize` will serialize this struct in `[u8; 3]` where `3` is the sum of sizes of `u8` and `u16`.
+`DesseStatic::serialize` will serialize this struct in `[u8; 3]` where `3` is the sum of sizes of `u8` and `u16`.
 
 ## Usage
 Add `desse` in your `Cargo.toml`'s `dependencies` section.
@@ -25,21 +25,21 @@ Add `desse` in your `Cargo.toml`'s `dependencies` section.
 desse = "0.2"
 ```
 
-`Desse` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive` macro. This
-crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for implementing `Desse`
-trait.
+`DesseStatic` trait can be implemented for any struct or enum (whose size is known at compile time) using `derive`
+macro. This crate also provides a `derive` macro for implementing `DesseSized` trait which is necessary for implementing
+`DesseStatic` trait.
 ```
-use desse::{Desse, DesseSized};
+use desse::{DesseStatic, DesseSized};
 
-#[derive(Debug, PartialEq, Desse, DesseSized)]
+#[derive(Debug, PartialEq, DesseStatic, DesseSized)]
 struct MyStruct {
     a: u8,
     b: u16,
 }
 ```
 
-Now, you can use `Desse::serialize` and `Desse::deserialize_from` for serialization and deserialization of this 
-struct.
+Now, you can use `DesseStatic::serialize` and `DesseStatic::deserialize_from` for serialization and deserialization of
+this struct.
 
 ```
 let my_struct = MyStruct { a: 5, b: 1005 };
@@ -49,7 +49,7 @@ let new_struct = MyStruct::deserialize_from(&serialized);
 assert_eq!(my_struct, new_struct);
 ```
 
-Note that `Desse::serialize` returns an array of fixed length (`3` in above case) and `Desse::deserialize` takes
+Note that `DesseStatic::serialize` returns an array of fixed length (`3` in above case) and `Desse::deserialize` takes
 reference to an array of fixed length as argument.
 
 ## Performance
@@ -103,8 +103,8 @@ cargo bench
 
 ## Future Improvements
 Once [`const_generics`](https://github.com/rust-lang/rfcs/blob/master/text/2000-const-generics.md) is implemented
-in Rust, we can provide default implementations for many types such as, `impl Desse for [T; n] where T: Desse`, and
-other variable size statically allocated types in Rust.
+in Rust, we can provide default implementations for many types such as, `impl DesseStatic for [T; n] where T: DesseStatic`,
+and other variable size statically allocated types in Rust.
 
 ## License
 Licensed under either of
