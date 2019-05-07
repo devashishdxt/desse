@@ -30,8 +30,9 @@ serde_derive = "1.0"
 bincode = "1.1"
 
 [features]
-default = ["derive"]
+default = ["derive", "dynamic"]
 derive = ["desse-derive"]
+dynamic = []
 
 [[bench]]
 name = "struct_benchmark"

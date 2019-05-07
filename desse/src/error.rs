@@ -33,12 +33,15 @@ impl Display for Error {
 pub enum ErrorKind {
     /// Returned when deserialization from bytes to char fails.
     InvalidChar,
+    /// Returned when deserialization from bytes to str fails.
+    InvalidStr,
 }
 
 impl Display for ErrorKind {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             ErrorKind::InvalidChar => write!(f, "Deserialization from bytes to char failed"),
+            ErrorKind::InvalidStr => write!(f, "Deserialization from bytes to String failed"),
         }
     }
 }
