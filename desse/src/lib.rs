@@ -58,9 +58,16 @@
 
 #![no_std]
 
+#[cfg(feature = "dynamic")]
+extern crate alloc;
+
+#[cfg(feature = "dynamic")]
+mod desse_dynamic;
 mod desse_static;
 mod error;
 
+#[cfg(feature = "dynamic")]
+pub use crate::desse_dynamic::{DesseDynamic, DesseUnsized};
 pub use crate::desse_static::{DesseSized, DesseStatic};
 pub use crate::error::{Error, ErrorKind, Result};
 
