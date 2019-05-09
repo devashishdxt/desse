@@ -1,5 +1,8 @@
 use core::fmt::{Display, Formatter};
 
+#[cfg(feature = "dynamic")]
+use alloc::string::FromUtf8Error;
+
 /// Alias of `Result` objects that return [`Error`](self::Error)
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -34,14 +37,30 @@ pub enum ErrorKind {
     /// Returned when deserialization from bytes to char fails.
     InvalidChar,
     /// Returned when deserialization from bytes to str fails.
+    #[cfg(feature = "dynamic")]
     InvalidStr,
+    /// Returned when input slice is of invalid length.
+    #[cfg(feature = "dynamic")]
+    InvalidSliceLength,
 }
 
 impl Display for ErrorKind {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             ErrorKind::InvalidChar => write!(f, "Deserialization from bytes to char failed"),
+            #[cfg(feature = "dynamic")]
             ErrorKind::InvalidStr => write!(f, "Deserialization from bytes to String failed"),
+            #[cfg(feature = "dynamic")]
+            ErrorKind::InvalidSliceLength => write!(f, "Input slice is of invalid length"),
+        }
+    }
+}
+
+#[cfg(feature = "dynamic")]
+impl From<FromUtf8Error> for Error {
+    fn from(_: FromUtf8Error) -> Error {
+        Error {
+            kind: ErrorKind::InvalidStr,
         }
     }
 }
