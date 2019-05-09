@@ -6,14 +6,14 @@ use alloc::vec::Vec;
 
 use crate::{DesseSized, DesseStatic, ErrorKind, Result};
 
-/// Marker trait for all types whose size is not known at compile time
-pub trait DesseUnsized: Sized {
+/// Any type must implement this trait for serialization and deserialization
+pub trait DesseDynamic {
+    /// Type of deserialized object
+    type Output: DesseDynamic;
+
     /// Returns the size of bytes after serialization
     fn serialized_size(&self) -> usize;
-}
 
-/// Any type must implement this trait for serialization and deserialization
-pub trait DesseDynamic: DesseUnsized {
     /// Serializes current object into a vector
     fn serialize(&self) -> Result<Vec<u8>>;
 
@@ -21,7 +21,7 @@ pub trait DesseDynamic: DesseUnsized {
     ///
     /// # Error
     ///
-    /// This function returns error (`ErrorKind::InvalidSliceLength`) when length of input slice is not equal to
+    /// This function returns error (`ErrorKind::InvalidSliceLength`) when length of input slice is less than
     /// `serialized_size()`.
     fn serialize_into(&self, bytes: &mut [u8]) -> Result<()>;
 
@@ -37,65 +37,26 @@ pub trait DesseDynamic: DesseUnsized {
     /// # Error
     ///
     /// This function returns error (`ErrorKind::InvalidSliceLength`) when length of input slice is less than expected.
-    fn deserialize_from(bytes: &[u8]) -> Result<Self>;
+    fn deserialize_from(bytes: &[u8]) -> Result<Self::Output>;
 
     /// Deserializes an object
     ///
     /// # Panic
     ///
     /// This function panics when length of input slice is not equal to `serialized_size()`.
-    unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self>;
-}
-
-impl DesseUnsized for String {
-    #[inline]
-    fn serialized_size(&self) -> usize {
-        <u64>::SIZE + self.len()
-    }
-}
-
-impl DesseUnsized for &str {
-    #[inline]
-    fn serialized_size(&self) -> usize {
-        <u64>::SIZE + self.len()
-    }
-}
-
-impl<T> DesseUnsized for T
-where
-    T: DesseSized,
-{
-    #[inline]
-    fn serialized_size(&self) -> usize {
-        <T>::SIZE
-    }
-}
-
-impl<T> DesseUnsized for Vec<T>
-where
-    T: DesseUnsized,
-{
-    #[inline]
-    fn serialized_size(&self) -> usize {
-        let sum: usize = self.iter().map(DesseUnsized::serialized_size).sum();
-        <u64>::SIZE + sum
-    }
-}
-
-impl<T> DesseUnsized for &[T]
-where
-    T: DesseUnsized,
-{
-    #[inline]
-    fn serialized_size(&self) -> usize {
-        let sum: usize = self.iter().map(DesseUnsized::serialized_size).sum();
-        <u64>::SIZE + sum
-    }
+    unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self::Output>;
 }
 
 macro_rules! impl_desse_dynamic {
     ($type: ty) => {
         impl DesseDynamic for $type {
+            type Output = Self;
+
+            #[inline]
+            fn serialized_size(&self) -> usize {
+                <$type>::SIZE
+            }
+
             #[inline]
             fn serialize(&self) -> Result<Vec<u8>> {
                 Ok(<$type as DesseStatic>::serialize(self).to_vec())
@@ -103,10 +64,10 @@ macro_rules! impl_desse_dynamic {
 
             #[inline]
             fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
-                if <$type>::SIZE != bytes.len() {
+                if bytes.len() < <$type>::SIZE {
                     Err(ErrorKind::InvalidSliceLength.into())
                 } else {
-                    unsafe { self.serialize_into_unchecked(bytes) }
+                    unsafe { self.serialize_into_unchecked(&mut bytes[0..<$type>::SIZE]) }
                 }
             }
 
@@ -121,7 +82,7 @@ macro_rules! impl_desse_dynamic {
             }
 
             #[inline]
-            fn deserialize_from(bytes: &[u8]) -> Result<Self> {
+            fn deserialize_from(bytes: &[u8]) -> Result<Self::Output> {
                 if bytes.len() < <$type>::SIZE {
                     Err(ErrorKind::InvalidSliceLength.into())
                 } else {
@@ -130,7 +91,7 @@ macro_rules! impl_desse_dynamic {
             }
 
             #[inline]
-            unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self> {
+            unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self::Output> {
                 <$type as DesseStatic>::deserialize_from(
                     &*(bytes[0..<$type>::SIZE].as_ptr() as *const [u8; <$type>::SIZE]),
                 )
@@ -155,6 +116,13 @@ impl_desse_dynamic!(i64);
 impl_desse_dynamic!(i128);
 
 impl DesseDynamic for String {
+    type Output = Self;
+
+    #[inline]
+    fn serialized_size(&self) -> usize {
+        <u64>::SIZE + self.len()
+    }
+
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
         let mut bytes = vec![0; self.serialized_size()];
@@ -164,10 +132,12 @@ impl DesseDynamic for String {
 
     #[inline]
     fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
-        if self.serialized_size() != bytes.len() {
+        let size = self.serialized_size();
+
+        if bytes.len() < size {
             Err(ErrorKind::InvalidSliceLength.into())
         } else {
-            unsafe { self.serialize_into_unchecked(bytes) }
+            unsafe { self.serialize_into_unchecked(&mut bytes[0..size]) }
         }
     }
 
@@ -175,14 +145,12 @@ impl DesseDynamic for String {
     unsafe fn serialize_into_unchecked(&self, bytes: &mut [u8]) -> Result<()> {
         let len = self.len() as u64;
         len.serialize_into_unchecked(&mut bytes[0..<u64>::SIZE])?;
-
         bytes[<u64>::SIZE..].copy_from_slice(self.as_bytes());
-
         Ok(())
     }
 
     #[inline]
-    fn deserialize_from(bytes: &[u8]) -> Result<Self> {
+    fn deserialize_from(bytes: &[u8]) -> Result<Self::Output> {
         if bytes.len() < <u64>::SIZE {
             Err(ErrorKind::InvalidSliceLength.into())
         } else {
@@ -199,13 +167,162 @@ impl DesseDynamic for String {
     }
 
     #[inline]
-    unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self> {
+    unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self::Output> {
         let len =
             <u64 as DesseDynamic>::deserialize_from_unchecked(&bytes[0..<u64>::SIZE])? as usize;
 
         Ok(String::from_utf8(
             bytes[<u64>::SIZE..(<u64>::SIZE + len)].to_vec(),
         )?)
+    }
+}
+
+impl DesseDynamic for &str {
+    type Output = String;
+
+    #[inline]
+    fn serialized_size(&self) -> usize {
+        <u64>::SIZE + self.len()
+    }
+
+    #[inline]
+    fn serialize(&self) -> Result<Vec<u8>> {
+        let mut bytes = vec![0; self.serialized_size()];
+        self.serialize_into(&mut bytes)?;
+        Ok(bytes)
+    }
+
+    #[inline]
+    fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
+        let size = self.serialized_size();
+
+        if bytes.len() < size {
+            Err(ErrorKind::InvalidSliceLength.into())
+        } else {
+            unsafe { self.serialize_into_unchecked(&mut bytes[0..size]) }
+        }
+    }
+
+    #[inline]
+    unsafe fn serialize_into_unchecked(&self, bytes: &mut [u8]) -> Result<()> {
+        let len = self.len() as u64;
+        len.serialize_into_unchecked(&mut bytes[0..<u64>::SIZE])?;
+        bytes[<u64>::SIZE..].copy_from_slice(self.as_bytes());
+        Ok(())
+    }
+
+    #[inline]
+    fn deserialize_from(bytes: &[u8]) -> Result<Self::Output> {
+        if bytes.len() < <u64>::SIZE {
+            Err(ErrorKind::InvalidSliceLength.into())
+        } else {
+            let len = unsafe {
+                <u64 as DesseDynamic>::deserialize_from_unchecked(&bytes[0..<u64>::SIZE])?
+            };
+
+            if bytes.len() < <u64>::SIZE + (len as usize) {
+                Err(ErrorKind::InvalidSliceLength.into())
+            } else {
+                unsafe { Self::deserialize_from_unchecked(bytes) }
+            }
+        }
+    }
+
+    #[inline]
+    unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self::Output> {
+        let len =
+            <u64 as DesseDynamic>::deserialize_from_unchecked(&bytes[0..<u64>::SIZE])? as usize;
+
+        Ok(String::from_utf8(
+            bytes[<u64>::SIZE..(<u64>::SIZE + len)].to_vec(),
+        )?)
+    }
+}
+
+impl<T> DesseDynamic for Vec<T>
+where
+    T: DesseDynamic,
+{
+    type Output = Vec<T::Output>;
+
+    #[inline]
+    fn serialized_size(&self) -> usize {
+        let sum = self
+            .iter()
+            .map(DesseDynamic::serialized_size)
+            .sum::<usize>();
+
+        <u64>::SIZE + sum
+    }
+
+    #[inline]
+    fn serialize(&self) -> Result<Vec<u8>> {
+        let mut bytes = vec![0; self.serialized_size()];
+        self.serialize_into(&mut bytes)?;
+        Ok(bytes)
+    }
+
+    #[inline]
+    fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
+        let size = self.serialized_size();
+
+        if bytes.len() < size {
+            Err(ErrorKind::InvalidSliceLength.into())
+        } else {
+            unsafe { self.serialize_into_unchecked(&mut bytes[0..size]) }
+        }
+    }
+
+    #[inline]
+    unsafe fn serialize_into_unchecked(&self, bytes: &mut [u8]) -> Result<()> {
+        let len = self.len() as u64;
+        len.serialize_into_unchecked(&mut bytes[0..<u64>::SIZE])?;
+
+        let mut counter = <u64>::SIZE;
+
+        for item in self.iter() {
+            let size = item.serialized_size();
+            DesseDynamic::serialize_into_unchecked(item, &mut bytes[counter..(counter + size)])?;
+            counter += size;
+        }
+
+        Ok(())
+    }
+
+    #[inline]
+    fn deserialize_from(bytes: &[u8]) -> Result<Self::Output> {
+        if bytes.len() < <u64>::SIZE {
+            Err(ErrorKind::InvalidSliceLength.into())
+        } else {
+            let len = unsafe {
+                <u64 as DesseDynamic>::deserialize_from_unchecked(&bytes[0..<u64>::SIZE])?
+            };
+
+            if bytes.len() < <u64>::SIZE + (len as usize) {
+                Err(ErrorKind::InvalidSliceLength.into())
+            } else {
+                unsafe { Self::deserialize_from_unchecked(bytes) }
+            }
+        }
+    }
+
+    #[inline]
+    unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self::Output> {
+        let len =
+            <u64 as DesseDynamic>::deserialize_from_unchecked(&bytes[0..<u64>::SIZE])? as usize;
+
+        let mut i = 0;
+        let mut output = Vec::with_capacity(len);
+
+        let mut counter = <u64>::SIZE;
+
+        while i < len {
+            output.push(<T>::deserialize_from_unchecked(&bytes[counter..])?);
+            counter += output[i].serialized_size();
+            i += 1;
+        }
+
+        Ok(output)
     }
 }
 
@@ -251,5 +368,21 @@ mod tests {
         let serialized = DesseDynamic::serialize(&s).unwrap();
         let new_s = String::deserialize_from(&serialized).unwrap();
         assert_eq!(s, new_s, "Invalid serialization / deserialization")
+    }
+
+    #[test]
+    fn check_str() {
+        let s = "hello";
+        let serialized = DesseDynamic::serialize(&s).unwrap();
+        let new_s = String::deserialize_from(&serialized).unwrap();
+        assert_eq!(s, new_s, "Invalid serialization / deserialization")
+    }
+
+    #[test]
+    fn check_vec_str() {
+        let v = vec!["hello".to_string(), "world".to_string()];
+        let serialized = DesseDynamic::serialize(&vec!["hello", "world"]).unwrap();
+        let new_v = Vec::<String>::deserialize_from(&serialized).unwrap();
+        assert_eq!(v, new_v, "Invalid serialization / deserialization")
     }
 }
