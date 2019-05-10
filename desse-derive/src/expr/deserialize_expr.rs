@@ -31,7 +31,7 @@ impl DeserializeExpr {
                         let field_type = &field.ty;
 
                         exprs.push(quote! {
-                            #field_name: <#field_type>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))?
+                            #field_name: <#field_type as DesseStatic>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))?
                         });
 
                         counter = quote! { #counter + <#field_type>::SIZE };
@@ -57,7 +57,7 @@ impl DeserializeExpr {
                         let field_type = &field.ty;
 
                         exprs.push(quote! {
-                            <#field_type>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))?
+                            <#field_type as DesseStatic>::deserialize_from(&*(bytes[ (#counter) .. ( #counter + <#field_type>::SIZE ) ].as_ptr() as *const [u8; <#field_type>::SIZE]))?
                         });
 
                         counter = quote! { #counter + <#field_type>::SIZE };
@@ -86,7 +86,7 @@ impl DeserializeExpr {
         let mut match_exprs = Vec::with_capacity(variant_count);
 
         let variant_expr = quote! {
-            let variant = unsafe { <#size_type>::deserialize_from(&*(bytes[0..<#size_type>::SIZE].as_ptr() as *const [u8; <#size_type>::SIZE]))? };
+            let variant = unsafe { <#size_type as DesseStatic>::deserialize_from(&*(bytes[0..<#size_type>::SIZE].as_ptr() as *const [u8; <#size_type>::SIZE]))? };
         };
 
         for (i, variant) in enum_data.variants.iter().enumerate() {

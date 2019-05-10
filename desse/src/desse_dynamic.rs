@@ -1,8 +1,8 @@
 #![cfg(feature = "dynamic")]
 
 use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
-use core::ptr::write_bytes;
 
 use crate::{DesseSized, DesseStatic, ErrorKind, Result};
 
@@ -43,7 +43,7 @@ pub trait DesseDynamic {
     ///
     /// # Panic
     ///
-    /// This function panics when length of input slice is not equal to `serialized_size()`.
+    /// This function panics when length of input slice is less than expected.
     unsafe fn deserialize_from_unchecked(bytes: &[u8]) -> Result<Self::Output>;
 }
 
@@ -67,7 +67,9 @@ macro_rules! impl_desse_dynamic {
                 if bytes.len() < <$type>::SIZE {
                     Err(ErrorKind::InvalidSliceLength.into())
                 } else {
-                    unsafe { self.serialize_into_unchecked(&mut bytes[0..<$type>::SIZE]) }
+                    unsafe {
+                        DesseDynamic::serialize_into_unchecked(self, &mut bytes[0..<$type>::SIZE])
+                    }
                 }
             }
 
@@ -86,7 +88,7 @@ macro_rules! impl_desse_dynamic {
                 if bytes.len() < <$type>::SIZE {
                     Err(ErrorKind::InvalidSliceLength.into())
                 } else {
-                    unsafe { Self::deserialize_from_unchecked(bytes) }
+                    unsafe { <Self as DesseDynamic>::deserialize_from_unchecked(bytes) }
                 }
             }
 
@@ -125,30 +127,26 @@ impl DesseDynamic for String {
 
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
-        let mut bytes = Vec::with_capacity(self.serialized_size());
-        unsafe {
-            write_bytes(bytes.as_mut_ptr(), 0, self.serialized_size());
-            bytes.set_len(self.serialized_size());
-        }
-        self.serialize_into(&mut bytes)?;
+        let mut bytes = vec![0; DesseDynamic::serialized_size(self)];
+        DesseDynamic::serialize_into(self, &mut bytes)?;
         Ok(bytes)
     }
 
     #[inline]
     fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
-        let size = self.serialized_size();
+        let size = DesseDynamic::serialized_size(self);
 
         if bytes.len() < size {
             Err(ErrorKind::InvalidSliceLength.into())
         } else {
-            unsafe { self.serialize_into_unchecked(&mut bytes[0..size]) }
+            unsafe { DesseDynamic::serialize_into_unchecked(self, &mut bytes[0..size]) }
         }
     }
 
     #[inline]
     unsafe fn serialize_into_unchecked(&self, bytes: &mut [u8]) -> Result<()> {
         let len = self.len() as u64;
-        len.serialize_into_unchecked(&mut bytes[0..<u64>::SIZE])?;
+        DesseDynamic::serialize_into_unchecked(&len, &mut bytes[0..<u64>::SIZE])?;
         bytes[<u64>::SIZE..].copy_from_slice(self.as_bytes());
         Ok(())
     }
@@ -165,7 +163,7 @@ impl DesseDynamic for String {
             if bytes.len() < <u64>::SIZE + (len as usize) {
                 Err(ErrorKind::InvalidSliceLength.into())
             } else {
-                unsafe { Self::deserialize_from_unchecked(bytes) }
+                unsafe { <Self as DesseDynamic>::deserialize_from_unchecked(bytes) }
             }
         }
     }
@@ -191,30 +189,26 @@ impl DesseDynamic for &str {
 
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
-        let mut bytes = Vec::with_capacity(self.serialized_size());
-        unsafe {
-            write_bytes(bytes.as_mut_ptr(), 0, self.serialized_size());
-            bytes.set_len(self.serialized_size());
-        }
-        self.serialize_into(&mut bytes)?;
+        let mut bytes = vec![0; DesseDynamic::serialized_size(self)];
+        DesseDynamic::serialize_into(self, &mut bytes)?;
         Ok(bytes)
     }
 
     #[inline]
     fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
-        let size = self.serialized_size();
+        let size = DesseDynamic::serialized_size(self);
 
         if bytes.len() < size {
             Err(ErrorKind::InvalidSliceLength.into())
         } else {
-            unsafe { self.serialize_into_unchecked(&mut bytes[0..size]) }
+            unsafe { DesseDynamic::serialize_into_unchecked(self, &mut bytes[0..size]) }
         }
     }
 
     #[inline]
     unsafe fn serialize_into_unchecked(&self, bytes: &mut [u8]) -> Result<()> {
         let len = self.len() as u64;
-        len.serialize_into_unchecked(&mut bytes[0..<u64>::SIZE])?;
+        DesseDynamic::serialize_into_unchecked(&len, &mut bytes[0..<u64>::SIZE])?;
         bytes[<u64>::SIZE..].copy_from_slice(self.as_bytes());
         Ok(())
     }
@@ -231,7 +225,7 @@ impl DesseDynamic for &str {
             if bytes.len() < <u64>::SIZE + (len as usize) {
                 Err(ErrorKind::InvalidSliceLength.into())
             } else {
-                unsafe { Self::deserialize_from_unchecked(bytes) }
+                unsafe { <Self as DesseDynamic>::deserialize_from_unchecked(bytes) }
             }
         }
     }
@@ -265,35 +259,31 @@ where
 
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
-        let mut bytes = Vec::with_capacity(self.serialized_size());
-        unsafe {
-            write_bytes(bytes.as_mut_ptr(), 0, self.serialized_size());
-            bytes.set_len(self.serialized_size());
-        }
-        self.serialize_into(&mut bytes)?;
+        let mut bytes = vec![0; DesseDynamic::serialized_size(self)];
+        DesseDynamic::serialize_into(self, &mut bytes)?;
         Ok(bytes)
     }
 
     #[inline]
     fn serialize_into(&self, bytes: &mut [u8]) -> Result<()> {
-        let size = self.serialized_size();
+        let size = DesseDynamic::serialized_size(self);
 
         if bytes.len() < size {
             Err(ErrorKind::InvalidSliceLength.into())
         } else {
-            unsafe { self.serialize_into_unchecked(&mut bytes[0..size]) }
+            unsafe { DesseDynamic::serialize_into_unchecked(self, &mut bytes[0..size]) }
         }
     }
 
     #[inline]
     unsafe fn serialize_into_unchecked(&self, bytes: &mut [u8]) -> Result<()> {
         let len = self.len() as u64;
-        len.serialize_into_unchecked(&mut bytes[0..<u64>::SIZE])?;
+        DesseDynamic::serialize_into_unchecked(&len, &mut bytes[0..<u64>::SIZE])?;
 
         let mut counter = <u64>::SIZE;
 
         for item in self.iter() {
-            let size = item.serialized_size();
+            let size = DesseDynamic::serialized_size(item);
             DesseDynamic::serialize_into_unchecked(item, &mut bytes[counter..(counter + size)])?;
             counter += size;
         }
@@ -313,7 +303,7 @@ where
             if bytes.len() < <u64>::SIZE + (len as usize) {
                 Err(ErrorKind::InvalidSliceLength.into())
             } else {
-                unsafe { Self::deserialize_from_unchecked(bytes) }
+                unsafe { <Self as DesseDynamic>::deserialize_from_unchecked(bytes) }
             }
         }
     }
@@ -329,8 +319,10 @@ where
         let mut counter = <u64>::SIZE;
 
         while i < len {
-            output.push(<T>::deserialize_from_unchecked(&bytes[counter..])?);
-            counter += output[i].serialized_size();
+            output.push(<T as DesseDynamic>::deserialize_from_unchecked(
+                &bytes[counter..],
+            )?);
+            counter += DesseDynamic::serialized_size(&output[i]);
             i += 1;
         }
 
