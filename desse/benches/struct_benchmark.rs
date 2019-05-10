@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate serde_derive;
 
+use core::ptr::write_bytes;
+
 use criterion::{black_box, criterion_group, criterion_main, Benchmark, Criterion};
 
 use bincode::{deserialize, serialize_into};
@@ -72,6 +74,29 @@ fn criterion_benchmark(c: &mut Criterion) {
             b.iter(|| {
                 let bytes: [u8; 9] = [253, 16, 250, 1, 0, 0, 0, 16, 250];
                 black_box(deserialize::<MySerdeStruct>(black_box(&bytes)));
+            })
+        }),
+    );
+
+    c.bench(
+        "vec::initialize",
+        Benchmark::new("ptr::write_bytes", |b| {
+            b.iter(|| {
+                let mut v: Vec<u8> = Vec::with_capacity(10);
+                unsafe {
+                    write_bytes(v.as_mut_ptr(), 1, 10);
+                    v.set_len(10);
+                }
+
+                v[0..5].copy_from_slice(&[0; 5]);
+                v[5..10].copy_from_slice(&[1; 5]);
+            })
+        })
+        .with_function("normal::initialize", |b| {
+            b.iter(|| {
+                let mut v: Vec<u8> = vec![0; 10];
+                v[0..5].copy_from_slice(&[0; 5]);
+                v[5..10].copy_from_slice(&[1; 5]);
             })
         }),
     );

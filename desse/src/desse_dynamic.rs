@@ -1,8 +1,8 @@
 #![cfg(feature = "dynamic")]
 
 use alloc::string::String;
-use alloc::vec;
 use alloc::vec::Vec;
+use core::ptr::write_bytes;
 
 use crate::{DesseSized, DesseStatic, ErrorKind, Result};
 
@@ -125,7 +125,11 @@ impl DesseDynamic for String {
 
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
-        let mut bytes = vec![0; self.serialized_size()];
+        let mut bytes = Vec::with_capacity(self.serialized_size());
+        unsafe {
+            write_bytes(bytes.as_mut_ptr(), 0, self.serialized_size());
+            bytes.set_len(self.serialized_size());
+        }
         self.serialize_into(&mut bytes)?;
         Ok(bytes)
     }
@@ -187,7 +191,11 @@ impl DesseDynamic for &str {
 
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
-        let mut bytes = vec![0; self.serialized_size()];
+        let mut bytes = Vec::with_capacity(self.serialized_size());
+        unsafe {
+            write_bytes(bytes.as_mut_ptr(), 0, self.serialized_size());
+            bytes.set_len(self.serialized_size());
+        }
         self.serialize_into(&mut bytes)?;
         Ok(bytes)
     }
@@ -257,7 +265,11 @@ where
 
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
-        let mut bytes = vec![0; self.serialized_size()];
+        let mut bytes = Vec::with_capacity(self.serialized_size());
+        unsafe {
+            write_bytes(bytes.as_mut_ptr(), 0, self.serialized_size());
+            bytes.set_len(self.serialized_size());
+        }
         self.serialize_into(&mut bytes)?;
         Ok(bytes)
     }
@@ -334,6 +346,7 @@ mod tests {
     use super::*;
 
     use alloc::string::ToString;
+    use alloc::vec;
 
     macro_rules! impl_desse_dynamic_test {
         ($type: ty, $name: ident) => {
