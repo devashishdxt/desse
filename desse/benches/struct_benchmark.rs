@@ -6,7 +6,7 @@ use core::ptr::write_bytes;
 use criterion::{black_box, criterion_group, criterion_main, Benchmark, Criterion};
 
 use bincode::{deserialize, serialize_into};
-use desse::{DesseSized, DesseStatic};
+use desse::{DesseDynamic, DesseSized, DesseStatic};
 
 #[derive(DesseStatic, DesseSized)]
 struct MyDesseStruct {
@@ -79,24 +79,17 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
 
     c.bench(
-        "vec::initialize",
-        Benchmark::new("ptr::write_bytes", |b| {
+        "dynamic::serialize",
+        Benchmark::new("desse:serialize", |b| {
+            let v = vec!["hello".to_string(), "world".to_string()];
             b.iter(|| {
-                let mut v: Vec<u8> = Vec::with_capacity(10);
-                unsafe {
-                    write_bytes(v.as_mut_ptr(), 1, 10);
-                    v.set_len(10);
-                }
-
-                v[0..5].copy_from_slice(&[0; 5]);
-                v[5..10].copy_from_slice(&[1; 5]);
+                DesseDynamic::serialize(&v).unwrap();
             })
         })
-        .with_function("normal::initialize", |b| {
+        .with_function("bincode::serialize", |b| {
+            let v = vec!["hello".to_string(), "world".to_string()];
             b.iter(|| {
-                let mut v: Vec<u8> = vec![0; 10];
-                v[0..5].copy_from_slice(&[0; 5]);
-                v[5..10].copy_from_slice(&[1; 5]);
+                bincode::serialize(&v).unwrap();
             })
         }),
     );

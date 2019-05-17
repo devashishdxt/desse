@@ -1,8 +1,8 @@
 #![deny(missing_docs)]
 //! Ultra fast binary serialization and deserialization for types with a constant size (known at compile time). This
 //! crate cannot be used to serialize or deserialize dynamically allocated types, such as,
-//! [`String`](std::string::String), [`Vec`](std::vec::Vec), [`HashMap`](std::collections::HashMap), etc., and types
-//! with unknown size at compile time such as [`slice`](std::slice), [`&str`](std::str), etc.
+//! [`String`](alloc::string::String), [`Vec`](alloc::vec::Vec), [`BTreeMap`](alloc::collections::BTreeMap), etc., and
+//! types with unknown size at compile time such as [`slice`](core::slice), [`&str`](core::str), etc.
 //!
 //! ## Binary Encoding Scheme
 //!
@@ -65,11 +65,19 @@ extern crate alloc;
 mod desse_dynamic;
 mod desse_static;
 mod error;
+#[cfg(feature = "dynamic")]
+mod reader;
+#[cfg(feature = "dynamic")]
+mod writer;
 
 #[cfg(feature = "dynamic")]
 pub use crate::desse_dynamic::DesseDynamic;
 pub use crate::desse_static::{DesseSized, DesseStatic};
 pub use crate::error::{Error, ErrorKind, Result};
+#[cfg(feature = "dynamic")]
+pub use crate::reader::Reader;
+#[cfg(feature = "dynamic")]
+pub use crate::writer::Writer;
 
 #[cfg(feature = "derive")]
 pub use desse_derive::*;
