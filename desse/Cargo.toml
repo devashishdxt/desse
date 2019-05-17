@@ -37,7 +37,3 @@ dynamic = []
 [[bench]]
 name = "struct_benchmark"
 harness = false
-
-[[bench]]
-name = "dynamic_benchmark"
-harness = false
