@@ -1,6 +1,7 @@
 #![cfg(feature = "dynamic")]
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::time::Duration;
 
 use crate::{DesseSized, DesseStatic, Reader, Result, Writer};
 
@@ -45,7 +46,7 @@ pub trait DesseDynamic {
     fn deserialize_from_unchecked<R: Reader>(reader: R) -> Result<Self::Output>;
 }
 
-macro_rules! impl_desse_dynamic {
+macro_rules! impl_desse_dynamic_for_static {
     ($type: ty) => {
         impl DesseDynamic for $type {
             type Output = Self;
@@ -93,20 +94,22 @@ macro_rules! impl_desse_dynamic {
     };
 }
 
-impl_desse_dynamic!(bool);
-impl_desse_dynamic!(char);
+impl_desse_dynamic_for_static!(bool);
+impl_desse_dynamic_for_static!(char);
 
-impl_desse_dynamic!(u8);
-impl_desse_dynamic!(u16);
-impl_desse_dynamic!(u32);
-impl_desse_dynamic!(u64);
-impl_desse_dynamic!(u128);
+impl_desse_dynamic_for_static!(u8);
+impl_desse_dynamic_for_static!(u16);
+impl_desse_dynamic_for_static!(u32);
+impl_desse_dynamic_for_static!(u64);
+impl_desse_dynamic_for_static!(u128);
 
-impl_desse_dynamic!(i8);
-impl_desse_dynamic!(i16);
-impl_desse_dynamic!(i32);
-impl_desse_dynamic!(i64);
-impl_desse_dynamic!(i128);
+impl_desse_dynamic_for_static!(i8);
+impl_desse_dynamic_for_static!(i16);
+impl_desse_dynamic_for_static!(i32);
+impl_desse_dynamic_for_static!(i64);
+impl_desse_dynamic_for_static!(i128);
+
+impl_desse_dynamic_for_static!(Duration);
 
 macro_rules! impl_desse_dynamic_str {
     ($type: ty) => {
@@ -271,6 +274,17 @@ mod tests {
     impl_desse_dynamic_test!(i32, check_primitive_i32);
     impl_desse_dynamic_test!(i64, check_primitive_i64);
     impl_desse_dynamic_test!(i128, check_primitive_i128);
+
+    #[test]
+    fn check_duration() {
+        let duration = Duration::new(rand::random(), rand::random());
+        let serialized = DesseDynamic::serialize(&duration).unwrap();
+        let new_duration = <Duration as DesseDynamic>::deserialize_from(&*serialized).unwrap();
+        assert_eq!(
+            duration, new_duration,
+            "Invalid serialization / deserialization"
+        )
+    }
 
     #[test]
     fn check_string() {

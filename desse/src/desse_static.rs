@@ -1,3 +1,5 @@
+use core::time::Duration;
+
 use crate::{ErrorKind, Result};
 
 /// Any type must implement this trait for serialization and deserialization
@@ -269,6 +271,51 @@ impl DesseStatic for char {
         match core::char::from_u32(u32::from_le_bytes(*bytes)) {
             None => Err(ErrorKind::InvalidChar.into()),
             Some(c) => Ok(c),
+        }
+    }
+}
+
+impl DesseSized for Duration {
+    const SIZE: usize = <u64>::SIZE + <u32>::SIZE;
+}
+
+impl DesseStatic for Duration {
+    type Output = [u8; Self::SIZE];
+
+    #[inline]
+    fn serialize(&self) -> Self::Output {
+        let mut bytes: Self::Output = [0; Self::SIZE];
+        self.serialize_into(&mut bytes);
+        bytes
+    }
+
+    #[inline]
+    fn serialize_into(&self, bytes: &mut Self::Output) {
+        unsafe {
+            DesseStatic::serialize_into(
+                &self.as_secs(),
+                &mut *(bytes[0..<u64>::SIZE].as_mut_ptr() as *mut [u8; <u64>::SIZE]),
+            );
+            DesseStatic::serialize_into(
+                &self.subsec_nanos(),
+                &mut *(bytes[<u64>::SIZE..(<u64>::SIZE + <u32>::SIZE)].as_mut_ptr()
+                    as *mut [u8; <u32>::SIZE]),
+            );
+        }
+    }
+
+    #[inline]
+    fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
+        unsafe {
+            Ok(Duration::new(
+                <u64>::deserialize_from(
+                    &*(bytes[0..<u64>::SIZE].as_ptr() as *const [u8; <u64>::SIZE]),
+                )?,
+                <u32>::deserialize_from(
+                    &*(bytes[<u64>::SIZE..(<u64>::SIZE + <u32>::SIZE)].as_ptr()
+                        as *const [u8; <u32>::SIZE]),
+                )?,
+            ))
         }
     }
 }
@@ -715,6 +762,17 @@ mod tests {
                 assert_eq!(num, new_num, "Invalid serialization / deserialization")
             }
         };
+    }
+
+    #[test]
+    fn check_duration() {
+        let duration = Duration::new(rand::random(), rand::random());
+        let new_duration =
+            <Duration>::deserialize_from(&DesseStatic::serialize(&duration)).unwrap();
+        assert_eq!(
+            duration, new_duration,
+            "Invalid serialization / deserialization"
+        )
     }
 
     impl_desse_static_test!(bool, check_primitive_bool);
