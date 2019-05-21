@@ -3,7 +3,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::time::Duration;
 
-use crate::{DesseSized, DesseStatic, Reader, Result, Writer};
+use crate::{DesseSized, DesseStatic, ErrorKind, Reader, Result, Writer};
 
 /// Any type must implement this trait for serialization and deserialization
 pub trait DesseDynamic {
@@ -238,6 +238,74 @@ where
     }
 }
 
+impl<T> DesseDynamic for Option<T>
+where
+    T: DesseDynamic,
+{
+    type Output = Option<T::Output>;
+
+    #[inline]
+    fn serialized_size(&self) -> usize {
+        match self {
+            None => <u8>::SIZE,
+            Some(ref value) => <u8>::SIZE + DesseDynamic::serialized_size(value),
+        }
+    }
+
+    #[inline]
+    fn serialize(&self) -> Result<Vec<u8>> {
+        let mut bytes = Vec::with_capacity(DesseDynamic::serialized_size(self));
+        DesseDynamic::serialize_into_unchecked(self, &mut bytes)?;
+        Ok(bytes)
+    }
+
+    #[inline]
+    fn serialize_into<W: Writer>(&self, mut writer: W) -> Result<()> {
+        match self {
+            None => DesseDynamic::serialize_into(&0u8, writer),
+            Some(ref value) => {
+                DesseDynamic::serialize_into(&1u8, &mut writer)?;
+                DesseDynamic::serialize_into(value, writer)
+            }
+        }
+    }
+
+    #[inline]
+    fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
+        match self {
+            None => DesseDynamic::serialize_into_unchecked(&0u8, writer),
+            Some(ref value) => {
+                DesseDynamic::serialize_into_unchecked(&1u8, &mut writer)?;
+                DesseDynamic::serialize_into_unchecked(value, writer)
+            }
+        }
+    }
+
+    #[inline]
+    fn deserialize_from<R: Reader>(mut reader: R) -> Result<Self::Output> {
+        let option = <u8 as DesseDynamic>::deserialize_from(&mut reader)?;
+
+        match option {
+            0 => Ok(None),
+            1 => Ok(Some(<T as DesseDynamic>::deserialize_from(reader)?)),
+            _ => Err(ErrorKind::InvalidInput.into()),
+        }
+    }
+
+    #[inline]
+    fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
+        let option = <u8 as DesseDynamic>::deserialize_from_unchecked(&mut reader)?;
+
+        match option {
+            0 => Ok(None),
+            1 => Ok(Some(<T as DesseDynamic>::deserialize_from_unchecked(
+                reader,
+            )?)),
+            _ => Err(ErrorKind::InvalidInput.into()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     // For initializing global memory allocator
@@ -308,5 +376,27 @@ mod tests {
         let serialized = DesseDynamic::serialize(&vec!["hello", "world"]).unwrap();
         let new_v = Vec::<String>::deserialize_from(&*serialized).unwrap();
         assert_eq!(v, new_v, "Invalid serialization / deserialization")
+    }
+
+    #[test]
+    fn check_option_none() {
+        let option: Option<String> = None;
+        let serialized = DesseDynamic::serialize(&option).unwrap();
+        let new_option = Option::<String>::deserialize_from(&*serialized).unwrap();
+        assert_eq!(
+            option, new_option,
+            "Invalid serialization / deserialization"
+        );
+    }
+
+    #[test]
+    fn check_option_some() {
+        let option: Option<String> = Some("Hello world!".to_string());
+        let serialized = DesseDynamic::serialize(&option).unwrap();
+        let new_option = Option::<String>::deserialize_from(&*serialized).unwrap();
+        assert_eq!(
+            option, new_option,
+            "Invalid serialization / deserialization"
+        );
     }
 }
