@@ -42,6 +42,9 @@ pub enum ErrorKind {
     /// Returned when input slice is of invalid length.
     #[cfg(feature = "dynamic")]
     InvalidSliceLength,
+    /// Returned when input slice cannot be de-serialized into given type.
+    #[cfg(feature = "dynamic")]
+    InvalidInput,
 }
 
 impl Display for ErrorKind {
@@ -52,6 +55,10 @@ impl Display for ErrorKind {
             ErrorKind::InvalidStr => write!(f, "Deserialization from bytes to String failed"),
             #[cfg(feature = "dynamic")]
             ErrorKind::InvalidSliceLength => write!(f, "Input slice is of invalid length"),
+            #[cfg(feature = "dynamic")]
+            ErrorKind::InvalidInput => {
+                write!(f, "input slice cannot be de-serialized into given type")
+            }
         }
     }
 }
