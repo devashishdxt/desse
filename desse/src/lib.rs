@@ -66,6 +66,8 @@ mod desse_dynamic;
 mod desse_static;
 mod error;
 #[cfg(feature = "dynamic")]
+mod private;
+#[cfg(feature = "dynamic")]
 mod reader;
 #[cfg(feature = "dynamic")]
 mod writer;

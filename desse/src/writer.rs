@@ -1,16 +1,17 @@
 #![cfg(feature = "dynamic")]
 use alloc::vec::Vec;
 
+use crate::private::Sealed;
 use crate::{ErrorKind, Result};
 
 /// Trait for doing `write` operations.
-pub trait Writer {
+pub trait Writer: Sealed {
     /// Writes the `buf` in current object.
     fn write(&mut self, buf: &[u8]) -> Result<()>;
 
     /// Writes `buf` in current object.
     ///
-    /// # Panics
+    /// # Panic
     ///
     /// Panics if there's not enough space in writer for storing `buf` (only when writer is `&mut [u8]`).
     fn write_unchecked(&mut self, buf: &[u8]) -> Result<()>;
