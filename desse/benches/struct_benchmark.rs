@@ -1,8 +1,6 @@
 #[macro_use]
 extern crate serde_derive;
 
-use core::ptr::write_bytes;
-
 use criterion::{black_box, criterion_group, criterion_main, Benchmark, Criterion};
 
 use bincode::{deserialize, serialize_into};
@@ -79,17 +77,19 @@ fn criterion_benchmark(c: &mut Criterion) {
     );
 
     c.bench(
-        "dynamic::serialize",
-        Benchmark::new("desse:serialize", |b| {
+        "dynamic::serde",
+        Benchmark::new("desse:serde", |b| {
             let v = vec!["hello".to_string(), "world".to_string()];
             b.iter(|| {
-                DesseDynamic::serialize(&v).unwrap();
+                let serialized = DesseDynamic::serialize(&v).unwrap();
+                <Vec<String>>::deserialize_from(&*serialized).unwrap();
             })
         })
-        .with_function("bincode::serialize", |b| {
+        .with_function("bincode::serde", |b| {
             let v = vec!["hello".to_string(), "world".to_string()];
             b.iter(|| {
-                bincode::serialize(&v).unwrap();
+                let serialized = bincode::serialize(&v).unwrap();
+                bincode::deserialize::<Vec<String>>(&serialized).unwrap();
             })
         }),
     );

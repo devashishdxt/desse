@@ -1,14 +1,15 @@
 #![cfg(feature = "dynamic")]
+use crate::private::Sealed;
 use crate::{ErrorKind, Result};
 
 /// Trait for doing `read` operations.
-pub trait Reader: Sized {
+pub trait Reader: Sealed + Sized {
     /// Reads `len` bytes from current reader
     fn read(&mut self, len: usize) -> Result<&[u8]>;
 
     /// Reads `len` bytes from current reader
     ///
-    /// # Panics
+    /// # Panic
     ///
     /// Panics if there are not enough bytes in reader
     fn read_unchecked(&mut self, len: usize) -> Result<&[u8]>;

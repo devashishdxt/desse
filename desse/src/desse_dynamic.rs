@@ -1,5 +1,4 @@
 #![cfg(feature = "dynamic")]
-
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -29,7 +28,7 @@ pub trait DesseDynamic {
     /// # Panic
     ///
     /// This function panics when length of input slice is not equal to `serialized_size()`.
-    unsafe fn serialize_into_unchecked<W: Writer>(&self, writer: W) -> Result<()>;
+    fn serialize_into_unchecked<W: Writer>(&self, writer: W) -> Result<()>;
 
     /// Deserializes byte slice into an object
     ///
@@ -43,7 +42,7 @@ pub trait DesseDynamic {
     /// # Panic
     ///
     /// This function panics when length of input slice is less than expected.
-    unsafe fn deserialize_from_unchecked<R: Reader>(reader: R) -> Result<Self::Output>;
+    fn deserialize_from_unchecked<R: Reader>(reader: R) -> Result<Self::Output>;
 }
 
 macro_rules! impl_desse_dynamic {
@@ -67,7 +66,7 @@ macro_rules! impl_desse_dynamic {
             }
 
             #[inline]
-            unsafe fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
+            fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
                 writer.write_unchecked(&<$type as DesseStatic>::serialize(self))
             }
 
@@ -82,11 +81,13 @@ macro_rules! impl_desse_dynamic {
             }
 
             #[inline]
-            unsafe fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
+            fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
                 let bytes = reader.read_unchecked(<$type>::SIZE)?;
-                <$type as DesseStatic>::deserialize_from(
-                    &*(bytes.as_ptr() as *const [u8; <$type>::SIZE]),
-                )
+                unsafe {
+                    <$type as DesseStatic>::deserialize_from(
+                        &*(bytes.as_ptr() as *const [u8; <$type>::SIZE]),
+                    )
+                }
             }
         }
     };
@@ -120,9 +121,7 @@ macro_rules! impl_desse_dynamic_str {
             #[inline]
             fn serialize(&self) -> Result<Vec<u8>> {
                 let mut bytes = Vec::with_capacity(DesseDynamic::serialized_size(self));
-                unsafe {
-                    DesseDynamic::serialize_into_unchecked(self, &mut bytes)?;
-                }
+                DesseDynamic::serialize_into_unchecked(self, &mut bytes)?;
                 Ok(bytes)
             }
 
@@ -134,7 +133,7 @@ macro_rules! impl_desse_dynamic_str {
             }
 
             #[inline]
-            unsafe fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
+            fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
                 let len = self.len() as u64;
                 DesseDynamic::serialize_into_unchecked(&len, &mut writer)?;
                 writer.write_unchecked(&self.as_bytes())
@@ -147,11 +146,9 @@ macro_rules! impl_desse_dynamic_str {
             }
 
             #[inline]
-            unsafe fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
+            fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
                 let len = <u64 as DesseDynamic>::deserialize_from_unchecked(&mut reader)?;
-                Ok(String::from_utf8_unchecked(
-                    reader.read(len as usize)?.to_vec(),
-                ))
+                Ok(String::from_utf8(reader.read(len as usize)?.to_vec())?)
             }
         }
     };
@@ -179,9 +176,7 @@ where
     #[inline]
     fn serialize(&self) -> Result<Vec<u8>> {
         let mut bytes = Vec::with_capacity(DesseDynamic::serialized_size(self));
-        unsafe {
-            DesseDynamic::serialize_into_unchecked(self, &mut bytes)?;
-        }
+        DesseDynamic::serialize_into_unchecked(self, &mut bytes)?;
         Ok(bytes)
     }
 
@@ -198,7 +193,7 @@ where
     }
 
     #[inline]
-    unsafe fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
+    fn serialize_into_unchecked<W: Writer>(&self, mut writer: W) -> Result<()> {
         let len = self.len() as u64;
         DesseDynamic::serialize_into_unchecked(&len, &mut writer)?;
 
@@ -224,7 +219,7 @@ where
     }
 
     #[inline]
-    unsafe fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
+    fn deserialize_from_unchecked<R: Reader>(mut reader: R) -> Result<Self::Output> {
         let len = <u64 as DesseDynamic>::deserialize_from_unchecked(&mut reader)?;
         let mut output = Vec::with_capacity(len as usize);
 
