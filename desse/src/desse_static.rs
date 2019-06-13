@@ -268,10 +268,8 @@ impl DesseStatic for char {
 
     #[inline]
     fn deserialize_from(bytes: &Self::Output) -> Result<Self> {
-        match core::char::from_u32(u32::from_le_bytes(*bytes)) {
-            None => Err(ErrorKind::InvalidChar.into()),
-            Some(c) => Ok(c),
-        }
+        core::char::from_u32(u32::from_le_bytes(*bytes))
+            .ok_or_else(|| ErrorKind::InvalidChar.into())
     }
 }
 

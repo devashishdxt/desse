@@ -246,10 +246,12 @@ where
 
     #[inline]
     fn serialized_size(&self) -> usize {
-        match self {
-            None => <u8>::SIZE,
-            Some(ref value) => <u8>::SIZE + DesseDynamic::serialized_size(value),
-        }
+        let inner_size = self
+            .as_ref()
+            .map(DesseDynamic::serialized_size)
+            .unwrap_or_default();
+
+        inner_size + <u8>::SIZE
     }
 
     #[inline]

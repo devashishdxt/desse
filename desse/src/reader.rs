@@ -19,10 +19,10 @@ impl Reader for &[u8] {
     #[inline]
     fn read(&mut self, len: usize) -> Result<&[u8]> {
         if self.len() < len {
-            Err(ErrorKind::InvalidSliceLength.into())
-        } else {
-            self.read_unchecked(len)
+            return Err(ErrorKind::InvalidSliceLength.into());
         }
+
+        self.read_unchecked(len)
     }
 
     #[inline]

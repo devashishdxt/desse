@@ -14,18 +14,21 @@ pub struct Error {
 
 impl Error {
     /// Returns [`ErrorKind`](self::ErrorKind) of current error
+    #[inline]
     pub fn kind(&self) -> ErrorKind {
         self.kind
     }
 }
 
 impl From<ErrorKind> for Error {
+    #[inline]
     fn from(kind: ErrorKind) -> Self {
         Self { kind }
     }
 }
 
 impl Display for Error {
+    #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.kind)
     }
@@ -65,6 +68,7 @@ impl Display for ErrorKind {
 
 #[cfg(feature = "dynamic")]
 impl From<FromUtf8Error> for Error {
+    #[inline]
     fn from(_: FromUtf8Error) -> Error {
         Error {
             kind: ErrorKind::InvalidStr,
