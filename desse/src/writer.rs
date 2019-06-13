@@ -21,10 +21,10 @@ impl Writer for &mut [u8] {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> Result<()> {
         if self.len() < buf.len() {
-            Err(ErrorKind::InvalidSliceLength.into())
-        } else {
-            self.write_unchecked(buf)
+            return Err(ErrorKind::InvalidSliceLength.into());
         }
+
+        self.write_unchecked(buf)
     }
 
     #[inline]
