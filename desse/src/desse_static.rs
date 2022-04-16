@@ -226,6 +226,9 @@ impl_desse_static!(i32);
 impl_desse_static!(i64);
 impl_desse_static!(i128);
 
+impl_desse_static!(f32);
+impl_desse_static!(f64);
+
 impl DesseSized for bool {
     const SIZE: usize = core::mem::size_of::<Self>();
 }
